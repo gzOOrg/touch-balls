@@ -26,6 +26,9 @@ export class Network {
     this.onGameStateUpdate = null;
     this.onShot = null;
     this.onTurnChange = null;
+    this.onGameStart = null;
+    this.onPlayerNamesUpdate = null;
+    this.onGameSettingsUpdate = null;
   }
   
   /**
@@ -169,9 +172,10 @@ export class Network {
       // Démarrer le ping
       this.startPingInterval();
       
-      // Si on est l'hôte, envoyer l'état initial
+      // Si on est l'hôte, envoyer l'état initial et les paramètres
       if (this.isHost) {
         this.syncGameState();
+        // L'hôte enverra les paramètres quand il sera prêt
       }
     });
     
@@ -236,6 +240,27 @@ export class Network {
         this.isMyTurn = (this.isHost && data.turn === 0) || (!this.isHost && data.turn === 1);
         if (this.onTurnChange) {
           this.onTurnChange(data.turn, this.isMyTurn);
+        }
+        break;
+        
+      case MESSAGE_TYPE.GAME_START:
+        console.log('🎮 Démarrage du jeu reçu!');
+        if (this.onGameStart) {
+          this.onGameStart(data);
+        }
+        break;
+        
+      case MESSAGE_TYPE.PLAYER_NAMES:
+        console.log('👥 Noms des joueurs reçus:', data);
+        if (this.onPlayerNamesUpdate) {
+          this.onPlayerNamesUpdate(data);
+        }
+        break;
+        
+      case MESSAGE_TYPE.GAME_SETTINGS:
+        console.log('⚙️ Paramètres du jeu reçus:', data);
+        if (this.onGameSettingsUpdate) {
+          this.onGameSettingsUpdate(data);
         }
         break;
     }
@@ -316,6 +341,37 @@ export class Network {
     return this.sendMessage({
       type: MESSAGE_TYPE.TURN_CHANGE,
       turn
+    });
+  }
+  
+  /**
+   * Envoie le signal de démarrage du jeu
+   */
+  sendGameStart(gameData) {
+    return this.sendMessage({
+      type: MESSAGE_TYPE.GAME_START,
+      ...gameData
+    });
+  }
+  
+  /**
+   * Envoie les noms des joueurs
+   */
+  sendPlayerNames(player1Name, player2Name) {
+    return this.sendMessage({
+      type: MESSAGE_TYPE.PLAYER_NAMES,
+      player1: player1Name,
+      player2: player2Name
+    });
+  }
+  
+  /**
+   * Envoie les paramètres du jeu
+   */
+  sendGameSettings(settings) {
+    return this.sendMessage({
+      type: MESSAGE_TYPE.GAME_SETTINGS,
+      ...settings
     });
   }
   

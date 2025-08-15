@@ -54,7 +54,10 @@ export const MESSAGE_TYPE = {
   CHAT: 'chat',
   SHOT: 'shot',
   GAME_STATE: 'gameState',
-  TURN_CHANGE: 'turnChange'
+  TURN_CHANGE: 'turnChange',
+  GAME_START: 'gameStart',
+  PLAYER_NAMES: 'playerNames',
+  GAME_SETTINGS: 'gameSettings'
 };
 
 // Couleurs des boules

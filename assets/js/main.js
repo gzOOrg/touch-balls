@@ -211,6 +211,66 @@ function setupNetworkCallbacks() {
     gameState.currentTurn = turn;
     updateTurnIndicator(players[turn], gameState.isShot);
   };
+  
+  // Démarrage du jeu reçu
+  network.onGameStart = (data) => {
+    console.log('🎮 Démarrage du jeu reçu de l\'hôte!');
+    
+    // Mettre à jour les noms des joueurs
+    players[0].name = data.player1Name || 'Player 1';
+    players[1].name = data.player2Name || 'Player 2';
+    
+    // Mettre à jour la difficulté
+    difficulty = data.difficulty || DIFFICULTY.PRO;
+    
+    // Mettre à jour l'assistance
+    players[0].assist = data.player1Assist !== undefined ? data.player1Assist : true;
+    players[1].assist = data.player2Assist !== undefined ? data.player2Assist : true;
+    
+    // Démarrer automatiquement le jeu
+    startGame();
+  };
+  
+  // Mise à jour des noms des joueurs
+  network.onPlayerNamesUpdate = (data) => {
+    console.log('👥 Noms des joueurs mis à jour:', data);
+    players[0].name = data.player1 || 'Player 1';
+    players[1].name = data.player2 || 'Player 2';
+    
+    // Mettre à jour l'UI
+    document.getElementById('p1').value = players[0].name;
+    document.getElementById('p2').value = players[1].name;
+    updateScores(players);
+  };
+  
+  // Mise à jour des paramètres du jeu
+  network.onGameSettingsUpdate = (data) => {
+    console.log('⚙️ Paramètres du jeu mis à jour:', data);
+    
+    // Mettre à jour la difficulté
+    difficulty = data.difficulty || DIFFICULTY.PRO;
+    const diffInput = document.querySelector(`input[name="difficulty"][value="${difficulty}"]`);
+    if (diffInput) diffInput.checked = true;
+    
+    // Mettre à jour l'assistance
+    players[0].assist = data.player1Assist !== undefined ? data.player1Assist : true;
+    players[1].assist = data.player2Assist !== undefined ? data.player2Assist : true;
+    
+    document.getElementById('assistP1').checked = players[0].assist;
+    document.getElementById('assistP2').checked = players[1].assist;
+    
+    // Désactiver les contrôles pour le client
+    if (gameMode === GAME_MODE.GUEST) {
+      document.getElementById('p1').disabled = true;
+      document.getElementById('p2').disabled = true;
+      document.querySelectorAll('input[name="difficulty"]').forEach(input => input.disabled = true);
+      document.getElementById('assistP1').disabled = true;
+      document.getElementById('assistP2').disabled = true;
+      
+      // Afficher un message informatif
+      showAchievement('PARAMÈTRES SYNCHRONISÉS!');
+    }
+  };
 }
 
 /**
@@ -259,6 +319,35 @@ function startGame() {
     onTurnChange: (turn) => network.sendTurnChange(turn),
     onMatchEnd: (winner) => handleMatchEnd(winner)
   });
+  
+  // Si on est en mode multijoueur, synchroniser avec l'adversaire
+  if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+    // L'hôte envoie le signal de démarrage
+    if (gameMode === GAME_MODE.HOST) {
+      const gameData = {
+        player1Name: players[0].name,
+        player2Name: players[1].name,
+        difficulty: difficulty,
+        player1Assist: players[0].assist,
+        player2Assist: players[1].assist
+      };
+      
+      // Envoyer les noms et paramètres
+      network.sendPlayerNames(players[0].name, players[1].name);
+      network.sendGameSettings({
+        difficulty: difficulty,
+        player1Assist: players[0].assist,
+        player2Assist: players[1].assist
+      });
+      
+      // Envoyer le signal de démarrage
+      setTimeout(() => {
+        network.sendGameStart(gameData);
+        console.log('🎮 Signal de démarrage envoyé à l\'adversaire');
+        showAchievement('PARTIE SYNCHRONISÉE!');
+      }, 500);
+    }
+  }
   
   // Configurer la difficulté
   setDifficulty(difficulty);
