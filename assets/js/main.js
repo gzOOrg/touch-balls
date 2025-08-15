@@ -684,11 +684,12 @@ function updateUITexts() {
   const statLabels = document.querySelectorAll('.stat-label');
   statLabels.forEach(label => {
     const text = label.textContent;
-    if (text.includes('Score final') || text.includes('Eindscore')) {
+    // Détecter le type de statistique et appliquer la traduction appropriée
+    if (text.includes('Score') || text.includes('score') || text.includes('スコア') || text.includes('得分') || text.includes('النتيجة')) {
       label.textContent = t('finalScore');
-    } else if (text.includes('Tirs totaux') || text.includes('Totaal schoten')) {
+    } else if (text.includes('Tirs') || text.includes('schoten') || text.includes('shots') || text.includes('Schüsse') || text.includes('Tiros') || text.includes('ショット') || text.includes('击球') || text.includes('الضربات') || text.includes('Schëss')) {
       label.textContent = t('totalShots');
-    } else if (text.includes('Durée') || text.includes('Duur')) {
+    } else if (text.includes('Durée') || text.includes('Duur') || text.includes('Duration') || text.includes('Dauer') || text.includes('Duración') || text.includes('時間') || text.includes('时间') || text.includes('المدة')) {
       label.textContent = t('duration');
     }
   });
