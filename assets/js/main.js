@@ -2,7 +2,7 @@
  * Module principal - Point d'entrée de l'application
  */
 
-import { ui, showAchievement, updateStatus, toggleGameView, updateScores, updateTurnIndicator } from './ui.js';
+import { ui, initializeUI, showAchievement, updateStatus, toggleGameView, updateScores, updateTurnIndicator } from './ui.js';
 import { sfx } from './sfx.js';
 import { GAME_MODE, DIFFICULTY, AI_LEVEL } from './constants.js';
 import { copyToClipboard } from './utils.js';
@@ -459,11 +459,26 @@ function displayChatMessage(message, type) {
 function initializeEvents() {
   console.log('🎮 Initialisation des événements...');
   
+  // D'abord initialiser les références UI
+  initializeUI();
+  
+  // Vérifier que les éléments existent
+  if (!ui.localBtn || !ui.aiBtn || !ui.hostBtn || !ui.joinBtn) {
+    console.error('❌ ERREUR: Certains boutons UI ne sont pas trouvés!');
+    console.log('ui.localBtn:', ui.localBtn);
+    console.log('ui.aiBtn:', ui.aiBtn);
+    console.log('ui.hostBtn:', ui.hostBtn);
+    console.log('ui.joinBtn:', ui.joinBtn);
+    return;
+  }
+  
   // Boutons de mode de jeu
   ui.localBtn.addEventListener('click', localGameMode);
   ui.aiBtn.addEventListener('click', aiGameMode);
   ui.hostBtn.addEventListener('click', hostGameMode);
   ui.joinBtn.addEventListener('click', joinGameMode);
+  
+  console.log('✅ Event listeners ajoutés aux boutons de mode');
   
   // Boutons de contrôle
   ui.startBtn.addEventListener('click', startGame);

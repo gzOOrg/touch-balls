@@ -2,61 +2,85 @@
  * Module UI - Gestion de l'interface utilisateur
  */
 
-export const ui = {
-  start: document.getElementById('startScreen'), 
-  game: document.getElementById('gameUI'), 
-  startBtn: document.getElementById('startBtn'), 
-  restartBtn: document.getElementById('restartBtn'),
-  nextOverlay: document.getElementById('nextOverlay'), 
-  nextBtn: document.getElementById('nextBtn'), 
-  victory: document.getElementById('victoryOverlay'),
-  vTitle: document.getElementById('victoryTitle'), 
-  vSub: document.getElementById('victorySubtitle'), 
-  playAgain: document.getElementById('playAgainBtn'),
-  tBanner: document.getElementById('turnBanner'), 
-  tText: document.getElementById('turnText'), 
-  tBall: document.getElementById('turnBall'),
-  name1: document.getElementById('name1'),
-  name2: document.getElementById('name2'),
-  score1: document.getElementById('score1'),
-  score2: document.getElementById('score2'),
-  powerMeter: document.getElementById('powerMeter'), 
-  powerFill: document.getElementById('powerFill'),
-  statsPanel: document.getElementById('statsPanel'), 
-  shotCount: document.getElementById('shotCount'), 
-  streak: document.getElementById('streak'), 
-  gameTime: document.getElementById('gameTime'),
-  networkPanel: document.getElementById('networkPanel'), 
-  gameMode: document.getElementById('gameMode'), 
-  ping: document.getElementById('ping'), 
-  syncStatus: document.getElementById('syncStatus'),
+// Objet UI qui sera rempli après le chargement du DOM
+export const ui = {};
+
+/**
+ * Initialise toutes les références DOM
+ */
+export function initializeUI() {
+  console.log('📋 Initialisation des références UI...');
   
-  // Multiplayer UI
-  localBtn: document.getElementById('localBtn'), 
-  aiBtn: document.getElementById('aiBtn'), 
-  hostBtn: document.getElementById('hostBtn'), 
-  joinBtn: document.getElementById('joinBtn'),
-  multiplayerSection: document.getElementById('multiplayerSection'), 
-  hostSection: document.getElementById('hostSection'), 
-  joinSection: document.getElementById('joinSection'),
-  aiSection: document.getElementById('aiSection'), 
-  cancelAI: document.getElementById('cancelAI'),
-  myPeerId: document.getElementById('myPeerId'), 
-  friendId: document.getElementById('friendId'), 
-  connectBtn: document.getElementById('connectBtn'),
-  statusDot: document.getElementById('statusDot'), 
-  statusText: document.getElementById('statusText'), 
-  cancelMultiplayer: document.getElementById('cancelMultiplayer'),
+  // Écrans principaux
+  ui.start = document.getElementById('startScreen');
+  ui.game = document.getElementById('gameUI');
+  ui.startBtn = document.getElementById('startBtn');
+  ui.restartBtn = document.getElementById('restartBtn');
+  ui.nextOverlay = document.getElementById('nextOverlay');
+  ui.nextBtn = document.getElementById('nextBtn');
+  ui.victory = document.getElementById('victoryOverlay');
+  ui.vTitle = document.getElementById('victoryTitle');
+  ui.vSub = document.getElementById('victorySubtitle');
+  ui.playAgain = document.getElementById('playAgainBtn');
   
-  // Chat UI
-  toggleChat: document.getElementById('toggleChat'), 
-  chatPanel: document.getElementById('chatPanel'), 
-  closeChat: document.getElementById('closeChat'),
-  chatMessages: document.getElementById('chatMessages'), 
-  chatInput: document.getElementById('chatInput'), 
-  sendChat: document.getElementById('sendChat'),
-  copyPeerBtn: document.getElementById('copyPeerBtn')
-};
+  // Indicateurs de tour
+  ui.tBanner = document.getElementById('turnBanner');
+  ui.tText = document.getElementById('turnText');
+  ui.tBall = document.getElementById('turnBall');
+  
+  // Scores
+  ui.name1 = document.getElementById('name1');
+  ui.name2 = document.getElementById('name2');
+  ui.score1 = document.getElementById('score1');
+  ui.score2 = document.getElementById('score2');
+  
+  // Jauge de puissance
+  ui.powerMeter = document.getElementById('powerMeter');
+  ui.powerFill = document.getElementById('powerFill');
+  
+  // Statistiques
+  ui.statsPanel = document.getElementById('statsPanel');
+  ui.shotCount = document.getElementById('shotCount');
+  ui.streak = document.getElementById('streak');
+  ui.gameTime = document.getElementById('gameTime');
+  
+  // Réseau
+  ui.networkPanel = document.getElementById('networkPanel');
+  ui.gameMode = document.getElementById('gameMode');
+  ui.ping = document.getElementById('ping');
+  ui.syncStatus = document.getElementById('syncStatus');
+  
+  // Boutons de mode de jeu
+  ui.localBtn = document.getElementById('localBtn');
+  ui.aiBtn = document.getElementById('aiBtn');
+  ui.hostBtn = document.getElementById('hostBtn');
+  ui.joinBtn = document.getElementById('joinBtn');
+  
+  // Sections multijoueur
+  ui.multiplayerSection = document.getElementById('multiplayerSection');
+  ui.hostSection = document.getElementById('hostSection');
+  ui.joinSection = document.getElementById('joinSection');
+  ui.aiSection = document.getElementById('aiSection');
+  ui.cancelAI = document.getElementById('cancelAI');
+  ui.myPeerId = document.getElementById('myPeerId');
+  ui.friendId = document.getElementById('friendId');
+  ui.connectBtn = document.getElementById('connectBtn');
+  ui.statusDot = document.getElementById('statusDot');
+  ui.statusText = document.getElementById('statusText');
+  ui.cancelMultiplayer = document.getElementById('cancelMultiplayer');
+  
+  // Chat
+  ui.toggleChat = document.getElementById('toggleChat');
+  ui.chatPanel = document.getElementById('chatPanel');
+  ui.closeChat = document.getElementById('closeChat');
+  ui.chatMessages = document.getElementById('chatMessages');
+  ui.chatInput = document.getElementById('chatInput');
+  ui.sendChat = document.getElementById('sendChat');
+  ui.copyPeerBtn = document.getElementById('copyPeerBtn');
+  
+  console.log('✅ Références UI initialisées');
+  return ui;
+}
 
 /**
  * Affiche une notification d'achievement
