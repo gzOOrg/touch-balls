@@ -53,7 +53,7 @@
           <button class="btn-hero-primary" onclick="window.location.href='billard.html'">
             🎱 COMMENCER À JOUER
           </button>
-          <button class="btn-hero-secondary" onclick="scrollToSection('features')">
+          <button class="btn-hero-secondary" onclick="if(window.scrollToSection) window.scrollToSection('features'); else document.getElementById('features').scrollIntoView({behavior:'smooth'});">
             ✨ DÉCOUVRIR LES FONCTIONNALITÉS
           </button>
         </div>
