@@ -157,6 +157,54 @@ class Ball {
   draw() {
     if (!this.isActive) return;
     
+    // Halo pour les boules actives du joueur actuel
+    if (this.owner === gameState.currentTurn && !gameState.isShot && !gameState.roundOver) {
+      ctx.save();
+      
+      // Effet de halo pulsant
+      const pulseScale = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+      const haloRadius = this.radius * 2 * pulseScale;
+      
+      // Gradient pour le halo
+      const haloGrad = ctx.createRadialGradient(
+        this.x, this.y, this.radius,
+        this.x, this.y, haloRadius
+      );
+      
+      if (this.owner === 0) {
+        // Halo cyan pour les boules blanches
+        haloGrad.addColorStop(0, 'rgba(0, 255, 255, 0)');
+        haloGrad.addColorStop(0.5, 'rgba(0, 255, 255, 0.3)');
+        haloGrad.addColorStop(1, 'rgba(0, 255, 255, 0)');
+        ctx.shadowColor = '#00ffff';
+        ctx.shadowBlur = 30;
+      } else {
+        // Halo violet pour les boules noires
+        haloGrad.addColorStop(0, 'rgba(255, 0, 255, 0)');
+        haloGrad.addColorStop(0.5, 'rgba(255, 0, 255, 0.3)');
+        haloGrad.addColorStop(1, 'rgba(255, 0, 255, 0)');
+        ctx.shadowColor = '#ff00ff';
+        ctx.shadowBlur = 30;
+      }
+      
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, haloRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Anneau lumineux autour de la boule
+      ctx.strokeStyle = this.owner === 0 ? '#00ffff' : '#ff00ff';
+      ctx.lineWidth = 2;
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      
+      ctx.restore();
+    }
+    
     // Dessiner la traînée avec effet amélioré
     this.trail.forEach(point => {
       ctx.globalAlpha = point.alpha * 0.6;
@@ -516,10 +564,32 @@ function drawAimLine(ball, dragVector) {
     ctx.fill();
     
     // Ligne de rebond si applicable
-    if (hit.type === 'wall') {
+    if (hit.type === 'wall' || hit.type === 'ball') {
       const reflect = reflectVector(normalized, hit.normal);
-      ctx.strokeStyle = 'rgba(255, 0, 128, 0.7)';
-      ctx.shadowColor = 'rgba(255, 0, 128, 0.7)';
+      
+      // Couleur différente selon le type de rebond
+      if (hit.type === 'ball') {
+        // Rebond sur boule - couleur orange
+        ctx.strokeStyle = 'rgba(255, 128, 0, 0.7)';
+        ctx.shadowColor = 'rgba(255, 128, 0, 0.7)';
+        
+        // Marquer la boule cible avec un cercle
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 128, 0, 0.5)';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(hit.targetBall.x, hit.targetBall.y, hit.targetBall.radius + 5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      } else {
+        // Rebond sur mur - couleur rose
+        ctx.strokeStyle = 'rgba(255, 0, 128, 0.7)';
+        ctx.shadowColor = 'rgba(255, 0, 128, 0.7)';
+      }
+      
+      // Dessiner la ligne de rebond
+      ctx.setLineDash([10, 5]);
       ctx.beginPath();
       ctx.moveTo(hit.x, hit.y);
       ctx.lineTo(
@@ -616,7 +686,59 @@ function findFirstHit(ball, direction, maxDistance) {
     }
   }
   
-  // TODO: Vérifier les collisions avec les autres boules
+  // Vérifier les collisions avec les autres boules
+  gameState.balls.forEach(otherBall => {
+    // Ne pas vérifier la collision avec soi-même ou les boules inactives
+    if (otherBall === ball || !otherBall.isActive) return;
+    
+    // Calcul de l'intersection rayon-sphère
+    const dx = otherBall.x - ball.x;
+    const dy = otherBall.y - ball.y;
+    
+    // Coefficients de l'équation quadratique
+    const a = direction.x * direction.x + direction.y * direction.y;
+    const b = -2 * (direction.x * dx + direction.y * dy);
+    const c = dx * dx + dy * dy - Math.pow(ball.radius + otherBall.radius, 2);
+    
+    // Discriminant
+    const discriminant = b * b - 4 * a * c;
+    
+    if (discriminant >= 0) {
+      // Il y a une intersection
+      const sqrt_discriminant = Math.sqrt(discriminant);
+      const t1 = (-b - sqrt_discriminant) / (2 * a);
+      const t2 = (-b + sqrt_discriminant) / (2 * a);
+      
+      // On prend la plus petite valeur positive
+      let t = -1;
+      if (t1 > 0 && t2 > 0) {
+        t = Math.min(t1, t2);
+      } else if (t1 > 0) {
+        t = t1;
+      } else if (t2 > 0) {
+        t = t2;
+      }
+      
+      if (t > 0 && t < minDistance) {
+        // Point d'impact
+        const hitX = ball.x + direction.x * t;
+        const hitY = ball.y + direction.y * t;
+        
+        // Normale au point d'impact
+        const normalX = (hitX - otherBall.x) / (ball.radius + otherBall.radius);
+        const normalY = (hitY - otherBall.y) / (ball.radius + otherBall.radius);
+        
+        minDistance = t;
+        closestHit = {
+          x: hitX,
+          y: hitY,
+          type: 'ball',
+          normal: { x: normalX, y: normalY },
+          targetBall: otherBall
+        };
+      }
+    }
+  });
   
   return closestHit;
 }
