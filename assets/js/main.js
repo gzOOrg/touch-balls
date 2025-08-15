@@ -6,7 +6,7 @@ import { ui, initializeUI, showAchievement, updateStatus, toggleGameView, update
 import { sfx } from './sfx.js';
 import { GAME_MODE, DIFFICULTY, AI_LEVEL } from './constants.js';
 import { copyToClipboard } from './utils.js';
-import { initGame, render, updatePhysics, startMatch, setDifficulty, gameState, setGameModeGetter, setNetworkCallbacks } from './game.js';
+import { initGame, render, updatePhysics, startMatch, setDifficulty, gameState, setGameModeGetter, setPlayersGetter, setNetworkCallbacks } from './game.js';
 import { aiPlayer } from './ai.js';
 import { network } from './network.js';
 import { t, setLanguage, getLanguage } from './translations.js';
@@ -251,6 +251,7 @@ function startGame() {
   
   // Configurer le getter pour le mode de jeu
   setGameModeGetter(() => gameMode);
+  setPlayersGetter(() => players);
   
   // Configurer les callbacks réseau
   setNetworkCallbacks({
@@ -458,6 +459,20 @@ function updateUITexts() {
   
   const gameInstructions = document.getElementById('gameInstructions');
   if (gameInstructions) gameInstructions.innerHTML = t('gameInstructions');
+  
+  // Labels d'assistance de visée
+  const assistP1Label = document.getElementById('assistP1Label');
+  if (assistP1Label) assistP1Label.textContent = t('aimAssist');
+  
+  const assistP2Label = document.getElementById('assistP2Label');
+  if (assistP2Label) assistP2Label.textContent = t('aimAssist');
+  
+  // Labels des joueurs
+  const p1Label = document.getElementById('p1Label');
+  if (p1Label) p1Label.textContent = t('player1Label');
+  
+  const p2Label = document.getElementById('p2Label');
+  if (p2Label) p2Label.textContent = t('player2Label');
   
   // Labels de mode de jeu
   const gameModeLabels = document.querySelectorAll('label');
@@ -749,6 +764,63 @@ function initializeEvents() {
         [AI_LEVEL.TERMINATOR]: 'TERMINATOR'
       };
       players[1].name = names[aiLevel];
+    });
+  });
+  
+  // Checkboxes d'assistance de visée
+  const assistP1 = document.getElementById('assistP1');
+  const assistP2 = document.getElementById('assistP2');
+  
+  if (assistP1) {
+    assistP1.addEventListener('change', (e) => {
+      if (players[0]) {
+        players[0].assist = e.target.checked;
+        console.log('🎯 Assistance joueur 1:', players[0].assist);
+      }
+    });
+  }
+  
+  if (assistP2) {
+    assistP2.addEventListener('change', (e) => {
+      if (players[1]) {
+        players[1].assist = e.target.checked;
+        console.log('🎯 Assistance joueur 2:', players[1].assist);
+      }
+    });
+  }
+  
+  // Gérer le mode LEGEND qui désactive l'assistance
+  const difficultyInputs = document.querySelectorAll('input[name="difficulty"]');
+  difficultyInputs.forEach(input => {
+    input.addEventListener('change', (e) => {
+      const selectedDifficulty = parseInt(e.target.value);
+      
+      if (selectedDifficulty === DIFFICULTY.LEGEND) {
+        // Mode LEGEND - désactiver l'assistance
+        if (assistP1) {
+          assistP1.checked = false;
+          assistP1.disabled = true;
+        }
+        if (assistP2) {
+          assistP2.checked = false;
+          assistP2.disabled = true;
+        }
+        players[0].assist = false;
+        players[1].assist = false;
+        console.log('⚠️ Mode LEGEND - Assistance désactivée');
+      } else {
+        // Autres modes - réactiver l'assistance
+        if (assistP1) {
+          assistP1.disabled = false;
+          assistP1.checked = true;
+        }
+        if (assistP2) {
+          assistP2.disabled = false;
+          assistP2.checked = true;
+        }
+        players[0].assist = true;
+        players[1].assist = true;
+      }
     });
   });
   

@@ -44,6 +44,9 @@ let ctx = null;
 // Fonction pour obtenir le mode de jeu (sera définie par main.js)
 let getGameMode = null;
 
+// Fonction pour obtenir les joueurs (sera définie par main.js)
+let getPlayers = null;
+
 // Callback pour les événements réseau
 let onShot = null;
 let onTurnChange = null;
@@ -54,6 +57,13 @@ let onMatchEnd = null;
  */
 export function setGameModeGetter(getter) {
   getGameMode = getter;
+}
+
+/**
+ * Définit la fonction pour obtenir les joueurs
+ */
+export function setPlayersGetter(getter) {
+  getPlayers = getter;
 }
 
 /**
@@ -789,8 +799,11 @@ export function render() {
       ctx.restore();
     }
     
-    // Dessiner la ligne de visée (direction du tir)
-    drawAimLine(gameState.draggedBall, gameState.drag);
+    // Dessiner la ligne de visée (direction du tir) si l'assistance est activée
+    const players = getPlayers ? getPlayers() : null;
+    if (players && players[gameState.currentTurn] && players[gameState.currentTurn].assist) {
+      drawAimLine(gameState.draggedBall, gameState.drag);
+    }
   }
   
   // Afficher le point de clic pour le debug

@@ -16,6 +16,8 @@ export const translations = {
     // Joueurs
     player1: "Joueur 1",
     player2: "Joueur 2",
+    player1Label: "🤖 JOUEUR 1 (BLANC)",
+    player2Label: "⚡ JOUEUR 2 (NOIR)",
     playerTurn: "TOUR DE",
     
     // Niveaux de difficulté
@@ -67,7 +69,8 @@ export const translations = {
     // Textes d'aide
     difficultyHelp: "NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore",
     gameInstructions: "👆 Touche une boule, tire en arrière, relâche pour DÉTRUIRE !",
-    startGame: "COMMENCER LE MASSACRE"
+    startGame: "COMMENCER LE MASSACRE",
+    aimAssist: "Assistance de visée"
   },
   
   nl: {
@@ -83,6 +86,8 @@ export const translations = {
     // Spelers
     player1: "Speler 1",
     player2: "Speler 2",
+    player1Label: "🤖 SPELER 1 (WIT)",
+    player2Label: "⚡ SPELER 2 (ZWART)",
     playerTurn: "BEURT VAN",
     
     // Moeilijkheidsgraden
@@ -143,7 +148,8 @@ export const translations = {
     // Helpteksten
     difficultyHelp: "BEGINNER: Reuzengat • PRO: Evenwichtig • LEGENDE: Hardcore modus",
     gameInstructions: "👆 Raak een bal aan, trek terug, laat los om te VERNIETIGEN!",
-    startGame: "BEGIN HET BLOEDBAD"
+    startGame: "BEGIN HET BLOEDBAD",
+    aimAssist: "Richtassistentie"
   }
 };
 
