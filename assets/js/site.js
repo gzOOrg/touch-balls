@@ -873,32 +873,7 @@ function translatePage(lang) {
     }
   });
   
-  // Traduire les éléments spécifiques par ID ou classe
-  const elementsToTranslate = {
-    // Navigation
-    '.nav-link[href="#home"]': 'nav-home',
-    '.nav-link[href="#features"]': 'nav-features', 
-    '.nav-link[href="#game"]': 'nav-game',
-    '.nav-link[href="#about"]': 'nav-about',
-    
-    // Hero
-    '.title-main': 'hero-title',
-    '.title-sub': 'hero-subtitle',
-    '.hero-description': 'hero-description',
-    '.btn-hero-primary': 'hero-play-btn',
-    
-    // Stats
-    '.hero-stats .stat:nth-child(1) .stat-label': 'stat-languages',
-    '.hero-stats .stat:nth-child(2) .stat-label': 'stat-ai-levels', 
-    '.hero-stats .stat:nth-child(3) .stat-label': 'stat-fun'
-  };
-  
-  Object.entries(elementsToTranslate).forEach(([selector, key]) => {
-    const element = document.querySelector(selector);
-    if (element && translations[key]) {
-      element.textContent = translations[key];
-    }
-  });
+  // Les éléments sont maintenant traduits via data-translate, pas besoin de sélecteurs CSS spécifiques
   
   console.log(`🌍 Page traduite en ${lang.toUpperCase()}`);
 }
