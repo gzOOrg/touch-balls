@@ -111,60 +111,55 @@ body {
   width: 100%;
 }
 
-/* Navigation Greetings */
-.nav-greetings {
+/* Hero Language Buttons */
+.hero-language-buttons {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
 }
 
-.greeting {
+.nav-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(0,255,255,0.3);
+  border-radius: 20px;
   color: var(--text-gray);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
-  animation: colorShift 3s infinite alternate;
+  backdrop-filter: blur(5px);
 }
 
-.greeting:hover {
+.nav-lang-btn:hover {
+  background: rgba(0,255,255,0.2);
+  border-color: var(--primary-color);
   color: var(--primary-color);
   text-shadow: var(--shadow-neon);
-  transform: scale(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,255,255,0.3);
 }
 
-.neon-dot {
-  color: var(--accent-color);
-  font-size: 1.2rem;
-  animation: neonPulse 2s infinite;
-  text-shadow: 
-    0 0 5px var(--accent-color),
-    0 0 10px var(--accent-color),
-    0 0 15px var(--accent-color);
+.nav-lang-btn.active {
+  background: var(--gradient-primary);
+  border-color: var(--primary-color);
+  color: var(--text-light);
+  box-shadow: var(--shadow-neon);
 }
 
-@keyframes neonPulse {
-  0%, 100% { 
-    opacity: 1;
-    text-shadow: 
-      0 0 5px var(--accent-color),
-      0 0 10px var(--accent-color),
-      0 0 15px var(--accent-color);
-  }
-  50% { 
-    opacity: 0.7;
-    text-shadow: 
-      0 0 2px var(--accent-color),
-      0 0 5px var(--accent-color),
-      0 0 8px var(--accent-color);
-  }
+.nav-lang-btn .flag {
+  font-size: 14px;
 }
 
-@keyframes colorShift {
-  0% { color: var(--text-gray); }
-  25% { color: var(--primary-color); }
-  50% { color: var(--secondary-color); }
-  75% { color: var(--accent-color); }
-  100% { color: var(--text-gray); }
+.nav-lang-btn .lang-code {
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .btn-primary {
