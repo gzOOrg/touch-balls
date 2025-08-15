@@ -682,6 +682,146 @@ const siteTranslations = {
     'footer-contact': 'Contact',
     'footer-languages': 'Ondersteunde Talen',
     'footer-copyright': '© 2024 Epic Billiards. Gemaakt met ❤️ en veel ☕'
+  },
+  
+  zh: {
+    // Navigation
+    'nav-home': '首页',
+    'nav-features': '功能',
+    'nav-game': '游戏',
+    'nav-about': '关于',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': '台球重新定义',
+    'hero-description': '体验网络上最先进的台球游戏！挑战智能AI，多人游戏，享受超逼真的物理效果。',
+    'hero-play-btn': '🎱 立即开始',
+    
+    // Stats
+    'stat-languages': '语言',
+    'stat-ai-levels': 'AI等级',
+    'stat-fun': '乐趣',
+    
+    // Features Section
+    'features-title': '史诗级功能',
+    'ai-title': '终结者AI',
+    'ai-desc': '挑战我们最先进的AI！终结者分析数百万条轨迹，适应每种游戏情况。',
+    'ai-highlight': '超级智能',
+    
+    'languages-title': '9种语言',
+    'languages-desc': '用您喜欢的语言游戏！Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語。',
+    'languages-highlight': '多语言',
+    
+    'physics-title': '逼真物理',
+    'physics-desc': '享受超精确的物理模拟，逼真的碰撞，真实的摩擦和完美的弹跳。',
+    'physics-highlight': '超逼真',
+    
+    'multiplayer-title': '多人游戏',
+    'multiplayer-desc': '在线挑战朋友！只需分享您的游戏ID，就能随时随地一起游戏。',
+    'multiplayer-highlight': '在线',
+    
+    'difficulty-title': '3种难度',
+    'difficulty-desc': '从新手到传奇，选择您的挑战等级！巨大洞口、平衡或硬核模式。',
+    'difficulty-highlight': '渐进式',
+    
+    'responsive-title': '响应式',
+    'responsive-desc': '在PC、平板或手机上游戏！自适应界面和优化的触控操作。',
+    'responsive-highlight': '随处可玩',
+    
+    // Game Section
+    'game-title': '准备游戏？',
+    'local-title': '本地',
+    'local-desc': '在同一设备上双人游戏！非常适合挑战家人和朋友。',
+    'local-btn': '本地游戏',
+    
+    // About Section
+    'about-title': '关于Epic Billiards',
+    'about-future': '台球的未来',
+    'about-future-desc': 'Epic Billiards突破了在线台球游戏的界限。采用最新的网络技术开发，我们的游戏提供了无与伦比的沉浸式和竞技体验。',
+    'about-tech': '先进技术',
+    'about-tech-desc': '我们的专有物理引擎精确模拟碰撞、摩擦和弹跳。终结者AI使用尖端算法实时分析数百万条轨迹。',
+    'about-community': '全球社区',
+    'about-community-desc': '支持9种语言和在线多人游戏，Epic Billiards汇聚了全球台球爱好者社区。',
+    
+    // Footer
+    'footer-desc': '最好的在线台球游戏。免费，无需注册。',
+    'footer-game': '游戏',
+    'footer-play': '立即游戏',
+    'footer-support': '支持',
+    'footer-source': '源代码',
+    'footer-contact': '联系',
+    'footer-languages': '支持的语言',
+    'footer-copyright': '© 2024 Epic Billiards. 用❤️和大量☕制作'
+  },
+  
+  ja: {
+    // Navigation
+    'nav-home': 'ホーム',
+    'nav-features': '機能',
+    'nav-game': 'プレイ',
+    'nav-about': 'について',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': 'ビリヤード再発明',
+    'hero-description': 'ウェブ上で最も先進的なビリヤード体験を発見！インテリジェントなAIに挑戦し、マルチプレイヤーでプレイし、超リアルな物理を楽しもう。',
+    'hero-play-btn': '🎱 今すぐプレイ',
+    
+    // Stats
+    'stat-languages': '言語',
+    'stat-ai-levels': 'AIレベル',
+    'stat-fun': '楽しさ',
+    
+    // Features Section
+    'features-title': 'エピック機能',
+    'ai-title': 'ターミネーターAI',
+    'ai-desc': '最も先進的なAIに挑戦！ターミネーターは何百万もの軌道を分析し、あらゆるゲーム状況に適応します。',
+    'ai-highlight': 'ウルトラスマート',
+    
+    'languages-title': '9言語',
+    'languages-desc': 'お好みの言語でプレイ！Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語。',
+    'languages-highlight': '多言語',
+    
+    'physics-title': 'リアル物理',
+    'physics-desc': '超精密な物理シミュレーション、リアルな衝突、本格的な摩擦、完璧な跳ね返りをお楽しみください。',
+    'physics-highlight': 'ウルトラリアル',
+    
+    'multiplayer-title': 'マルチプレイヤー',
+    'multiplayer-desc': 'オンラインで友達に挑戦！ゲームIDを共有するだけで、どこからでも一緒にプレイできます。',
+    'multiplayer-highlight': 'オンライン',
+    
+    'difficulty-title': '3つの難易度',
+    'difficulty-desc': 'ノobからレジェンドまで、あなたの挑戦レベルを選択！巨大穴、バランス、またはハードコアモード。',
+    'difficulty-highlight': 'プログレッシブ',
+    
+    'responsive-title': 'レスポンシブ',
+    'responsive-desc': 'PC、タブレット、モバイルでプレイ！適応型インターフェースと最適化されたタッチコントロール。',
+    'responsive-highlight': 'どこでも',
+    
+    // Game Section
+    'game-title': 'プレイの準備はできましたか？',
+    'local-title': 'ローカル',
+    'local-desc': '同じデバイスで2人プレイ！家族や友達に挑戦するのに最適。',
+    'local-btn': 'ローカルプレイ',
+    
+    // About Section
+    'about-title': 'Epic Billiardsについて',
+    'about-future': 'ビリヤードの未来',
+    'about-future-desc': 'Epic Billiardsはオンラインビリヤードゲームの限界を押し広げます。最新のウェブ技術で開発された私たちのゲームは、比類のない没入型で競争力のある体験を提供します。',
+    'about-tech': '先進技術',
+    'about-tech-desc': '私たちの独自の物理エンジンは衝突、摩擦、跳ね返りを正確にシミュレートします。ターミネーターAIは最先端のアルゴリズムを使用して、リアルタイムで何百万もの軌道を分析します。',
+    'about-community': 'グローバルコミュニティ',
+    'about-community-desc': '9言語のサポートとオンラインマルチプレイヤーにより、Epic Billiardsは世界中のビリヤード愛好家のコミュニティを結集します。',
+    
+    // Footer
+    'footer-desc': '最高のオンラインビリヤードゲーム。無料、登録不要。',
+    'footer-game': 'ゲーム',
+    'footer-play': '今すぐプレイ',
+    'footer-support': 'サポート',
+    'footer-source': 'ソースコード',
+    'footer-contact': 'お問い合わせ',
+    'footer-languages': 'サポート言語',
+    'footer-copyright': '© 2024 Epic Billiards. ❤️とたくさんの☕で作られました'
   }
 };
 
