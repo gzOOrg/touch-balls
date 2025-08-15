@@ -79,7 +79,10 @@ async function hostGameMode() {
   ui.aiSection.style.display = 'none';
   ui.hostSection.style.display = 'block';
   ui.joinSection.style.display = 'none';
-  updateStatus('connecting', 'Initialisation du serveur...');
+  
+  // Réinitialiser l'état
+  updateStatus('connecting', 'Initialisation du serveur P2P...');
+  ui.myPeerId.textContent = 'Génération en cours...';
   
   resetButtonStyles();
   ui.hostBtn.style.background = 'linear-gradient(45deg,var(--neon-green),var(--neon-cyan))';
@@ -91,14 +94,30 @@ async function hostGameMode() {
     // Callback pour l'ID du peer
     network.onPeerIdReady = (id) => {
       ui.myPeerId.textContent = id;
+      updateStatus('waiting', 'En attente d\'un adversaire...');
+      showAchievement('SERVEUR PRÊT!');
+      console.log('🎮 Serveur P2P prêt avec ID:', id);
+    };
+    
+    // Callback pour la connexion établie
+    network.onConnectionReady = () => {
+      updateStatus('connected', 'Adversaire connecté!');
+      showAchievement('ADVERSAIRE CONNECTÉ!');
+      console.log('🎮 Adversaire connecté au serveur');
     };
     
     // Initialiser le serveur
     await network.initHost();
+    
   } catch(e) {
     console.error('Erreur lors de l\'hébergement:', e);
     updateStatus('error', 'Erreur de connexion');
     showAchievement('ERREUR DE CONNEXION!');
+    
+    // Retourner au mode local en cas d'erreur
+    setTimeout(() => {
+      localGameMode();
+    }, 2000);
   }
 }
 
@@ -112,13 +131,26 @@ function joinGameMode() {
   ui.aiSection.style.display = 'none';
   ui.hostSection.style.display = 'none';
   ui.joinSection.style.display = 'block';
-  updateStatus('connecting', 'Initialisation...');
+  
+  // Réinitialiser l'état
+  updateStatus('waiting', 'Prêt à se connecter...');
+  ui.friendId.value = '';
+  ui.friendId.focus();
   
   resetButtonStyles();
   ui.joinBtn.style.background = 'linear-gradient(45deg,var(--neon-green),var(--neon-cyan))';
   
   // Configurer les callbacks réseau
   setupNetworkCallbacks();
+  
+  // Callback pour la connexion établie
+  network.onConnectionReady = () => {
+    updateStatus('connected', 'Connecté à l\'hôte!');
+    showAchievement('CONNEXION ÉTABLIE!');
+    console.log('🎮 Connecté à l\'hôte');
+  };
+  
+  console.log('✅ Mode rejoindre initialisé');
 }
 
 /**
@@ -137,14 +169,44 @@ function cancelAI() {
  */
 function cancelMultiplayer() {
   console.log('Annulation multijoueur');
+  
+  // Déconnecter du réseau
   network.disconnect();
+  
+  // Réinitialiser l'état
   gameMode = GAME_MODE.LOCAL;
   ui.multiplayerSection.style.display = 'none';
-  updateStatus('', 'Déconnecté');
-  ui.gameMode.textContent = 'LOCAL';
+  ui.hostSection.style.display = 'none';
+  ui.joinSection.style.display = 'none';
+  
+  // Réinitialiser les champs
+  ui.myPeerId.textContent = 'Génération en cours...';
+  ui.friendId.value = '';
+  
+  // Réinitialiser le bouton de connexion
+  if (ui.connectBtn) {
+    ui.connectBtn.disabled = false;
+    ui.connectBtn.textContent = 'SE CONNECTER';
+  }
+  
+  // Masquer les éléments de chat
   ui.toggleChat.style.display = 'none';
   ui.chatPanel.style.display = 'none';
+  
+  // Mettre à jour l'interface
+  updateStatus('', 'Déconnecté');
+  ui.gameMode.textContent = 'LOCAL';
+  
+  // Réactiver les contrôles
+  document.getElementById('p1').disabled = false;
+  document.getElementById('p2').disabled = false;
+  document.querySelectorAll('input[name="difficulty"]').forEach(input => input.disabled = false);
+  document.getElementById('assistP1').disabled = false;
+  document.getElementById('assistP2').disabled = false;
+  
   resetButtonStyles();
+  
+  console.log('✅ Mode multijoueur annulé, retour au mode local');
 }
 
 /**
@@ -227,6 +289,9 @@ function setupNetworkCallbacks() {
     players[0].assist = data.player1Assist !== undefined ? data.player1Assist : true;
     players[1].assist = data.player2Assist !== undefined ? data.player2Assist : true;
     
+    // Afficher un message de confirmation
+    showAchievement('PARTIE DÉMARRÉE!');
+    
     // Démarrer automatiquement le jeu
     startGame();
   };
@@ -269,6 +334,9 @@ function setupNetworkCallbacks() {
       
       // Afficher un message informatif
       showAchievement('PARAMÈTRES SYNCHRONISÉS!');
+      
+      // Mettre à jour l'affichage des scores
+      updateScores(players);
     }
   };
 }
@@ -657,14 +725,55 @@ async function copyPeerId() {
  */
 async function connectToPeer() {
   const friendId = ui.friendId.value.trim();
-  if (friendId) {
-    console.log('Connexion vers:', friendId);
-    try {
-      await network.connectToHost(friendId);
-    } catch(e) {
-      console.error('Erreur de connexion:', e);
-      showAchievement('ERREUR DE CONNEXION!');
+  
+  if (!friendId) {
+    showAchievement('ENTRE UN ID!');
+    ui.friendId.focus();
+    return;
+  }
+  
+  console.log('🎯 Tentative de connexion vers:', friendId);
+  updateStatus('connecting', 'Connexion en cours...');
+  
+  try {
+    // Désactiver le bouton pendant la connexion
+    ui.connectBtn.disabled = true;
+    ui.connectBtn.textContent = 'CONNEXION...';
+    
+    await network.connectToHost(friendId);
+    
+    // Réactiver le bouton
+    ui.connectBtn.disabled = false;
+    ui.connectBtn.textContent = 'CONNECTÉ!';
+    
+    console.log('✅ Connexion réussie!');
+    
+  } catch(e) {
+    console.error('❌ Erreur de connexion:', e);
+    
+    // Réactiver le bouton
+    ui.connectBtn.disabled = false;
+    ui.connectBtn.textContent = 'SE CONNECTER';
+    
+    // Afficher l'erreur
+    let errorMessage = 'Erreur de connexion';
+    if (e.message.includes('Timeout')) {
+      errorMessage = 'Timeout - Vérifiez l\'ID';
+    } else if (e.message.includes('not found')) {
+      errorMessage = 'ID introuvable';
+    } else if (e.message.includes('Connection failed')) {
+      errorMessage = 'Échec de connexion';
     }
+    
+    updateStatus('error', errorMessage);
+    showAchievement('ERREUR DE CONNEXION!');
+    
+    // Retourner au mode local après 3 secondes
+    setTimeout(() => {
+      if (gameMode === GAME_MODE.GUEST) {
+        localGameMode();
+      }
+    }, 3000);
   }
 }
 
