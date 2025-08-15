@@ -13,13 +13,19 @@
       <span class="logo">🎱</span>
       <span class="brand-text" id="gameTitle">BILLARD ÉPIQUE</span>
     </div>
-    <div class="header-controls">
-      <select id="languageSelector" class="language-select">
-        <option value="fr">🇫🇷 Français</option>
-        <option value="nl">🇳🇱 Nederlands</option>
-      </select>
-      <button id="restartBtn" class="btn secondary">NOUVELLE PARTIE</button>
-    </div>
+            <div class="header-controls">
+          <div class="language-buttons">
+            <button class="lang-btn active" data-lang="fr" title="Français">
+              <span class="flag">🇫🇷</span>
+              <span class="lang-text">FR</span>
+            </button>
+            <button class="lang-btn" data-lang="nl" title="Nederlands">
+              <span class="flag">🇳🇱</span>
+              <span class="lang-text">NL</span>
+            </button>
+          </div>
+          <button id="restartBtn" class="btn secondary">NOUVELLE PARTIE</button>
+        </div>
   </div>
 
   <!-- Écran d'accueil -->

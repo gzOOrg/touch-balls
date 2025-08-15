@@ -647,23 +647,53 @@ function initializeEvents() {
   setLanguage(savedLanguage);
   updateUITexts();
   
-  // Sélecteur de langue
-  const languageSelector = document.getElementById('languageSelector');
-  if (languageSelector) {
-    languageSelector.value = savedLanguage;
-    languageSelector.addEventListener('change', (e) => {
-      const newLang = e.target.value;
+  // Boutons de langue
+  const langButtons = document.querySelectorAll('.lang-btn');
+  langButtons.forEach(btn => {
+    // Activer le bouton de la langue sauvegardée
+    if (btn.dataset.lang === savedLanguage) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+    
+    btn.addEventListener('click', (e) => {
+      const newLang = e.currentTarget.dataset.lang;
+      
+      // Mettre à jour la langue
       setLanguage(newLang);
       localStorage.setItem('billardLanguage', newLang);
       updateUITexts();
       
+      // Mettre à jour l'état actif des boutons
+      langButtons.forEach(b => {
+        if (b.dataset.lang === newLang) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+      
       // Animation de feedback
-      languageSelector.style.animation = 'pulse 0.5s ease';
+      e.currentTarget.style.animation = 'pulse 0.5s ease';
       setTimeout(() => {
-        languageSelector.style.animation = '';
+        e.currentTarget.style.animation = '';
       }, 500);
+      
+      // Son de clic
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = 800;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
     });
-  }
+  });
   
   // Boutons de mode de jeu
   ui.localBtn.addEventListener('click', localGameMode);

@@ -20,6 +20,17 @@
 - **🌈 Jauge de puissance** : Gradient vert → orange → rouge
 - **⚡ Glow néon** : Effets lumineux sur le trou central et la boule rouge
 
+## 🌍 Langues disponibles
+
+Le jeu est disponible en plusieurs langues :
+- 🇫🇷 **Français** (par défaut)
+- 🇳🇱 **Nederlands** (Néerlandais)
+
+Pour changer de langue :
+1. Cliquez sur les boutons de drapeau en haut de l'écran
+2. Le bouton actif s'illumine en néon cyan
+3. Votre choix est sauvegardé automatiquement
+
 ## 📁 Structure du projet
 
 ```

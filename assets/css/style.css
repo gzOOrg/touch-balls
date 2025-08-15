@@ -127,14 +127,77 @@ body{
   color: #000;
 }
 
-/* Icône de globe devant le sélecteur */
-.language-select::before {
-  content: "🌐";
+/* Nouveaux boutons de langue */
+.language-buttons {
+  display: flex;
+  gap: 5px;
+  background: rgba(0,0,0,0.6);
+  padding: 5px;
+  border-radius: 25px;
+  border: 2px solid rgba(0,255,255,0.3);
+}
+
+.lang-btn {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.lang-btn:hover {
+  background: rgba(0,255,255,0.1);
+  border-color: var(--neon-cyan);
+  transform: scale(1.05);
+}
+
+.lang-btn.active {
+  background: linear-gradient(135deg, rgba(0,255,255,0.2) 0%, rgba(0,255,255,0.1) 100%);
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(0,255,255,0.5), inset 0 0 10px rgba(0,255,255,0.2);
+}
+
+.lang-btn.active::before {
+  content: '';
   position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, transparent 70%);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.lang-btn .flag {
   font-size: 20px;
+  display: inline-block;
+  animation: wave 3s ease-in-out infinite;
+}
+
+.lang-btn.active .flag {
+  animation: wave 1s ease-in-out infinite;
+}
+
+.lang-text {
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 1px;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
 }
 
 .brand-text{
@@ -876,8 +939,11 @@ canvas{
 @media (max-width: 768px) {
   .header{flex-direction:column;gap:15px}
   .brand{font-size:20px}
-  .header-controls{flex-direction:column;width:100%}
-  .language-select{width:100%}
+  .header-controls{flex-direction:column;width:100%;align-items:center;gap:10px}
+  .language-buttons{order:-1;width:auto;justify-content:center}
+  .lang-btn{min-width:70px;padding:6px 12px;font-size:12px}
+  .lang-btn .flag{font-size:18px}
+  .lang-text{font-size:12px}
   .row{flex-direction:column}
   .stars{justify-content:center}
   .scores-hud{flex-direction:column;gap:15px}
