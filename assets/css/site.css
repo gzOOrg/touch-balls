@@ -802,6 +802,7 @@ section {
   color: var(--primary-color);
   margin-bottom: 15px;
   margin-top: 30px;
+  text-align: left;
 }
 
 .about-text h3:first-child {
@@ -812,6 +813,7 @@ section {
   color: var(--text-gray);
   line-height: 1.8;
   margin-bottom: 20px;
+  text-align: left;
 }
 
 .about-features {
