@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>🎱 BILLARD ÉPIQUE - MULTIJOUEUR</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <span class="logo">🎱</span>
+      <span class="brand-text">BILLARD ÉPIQUE</span>
+    </div>
+    <button id="restartBtn" class="btn secondary">NOUVELLE PARTIE</button>
+  </div>
+
+  <!-- Écran d'accueil -->
+  <div id="startScreen" class="card">
+    <!-- Mode de jeu -->
+    <div class="row">
+      <div class="col">
+        <label>🎮 MODE DE JEU</label>
+        <div style="display:flex;gap:15px;margin:15px 0;flex-wrap:wrap">
+          <button id="localBtn" class="btn">LOCAL</button>
+          <button id="aiBtn" class="btn">vs IA</button>
+          <button id="hostBtn" class="btn">HÉBERGER</button>
+          <button id="joinBtn" class="btn">REJOINDRE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section IA -->
+    <div id="aiSection" class="multiplayer-section" style="display:none">
+      <label>🤖 NIVEAU DE L'IA</label>
+      <div class="stars" style="margin:15px 0">
+        <input type="radio" name="aiLevel" id="ai1" value="1" checked>
+        <label for="ai1">DUMB</label>
+        <input type="radio" name="aiLevel" id="ai2" value="2">
+        <label for="ai2">SMART</label>
+        <input type="radio" name="aiLevel" id="ai3" value="3">
+        <label for="ai3">TERMINATOR</label>
+      </div>
+      <div class="help">DUMB: Tire au hasard • SMART: Stratégie basique • TERMINATOR: Calculs parfaits</div>
+      <button id="cancelAI" class="btn danger" style="margin-top:15px">ANNULER</button>
+    </div>
+
+    <!-- Section multijoueur -->
+    <div id="multiplayerSection" class="multiplayer-section" style="display:none">
+      <div class="connection-status">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Déconnecté</span>
+      </div>
+      
+      <div id="hostSection" style="display:none">
+        <label>🔗 TON ID DE PARTIE</label>
+        <div class="peer-id-display" id="myPeerId">Génération en cours...</div>
+        <button class="btn secondary" id="copyPeerBtn" style="padding:8px 16px;font-size:12px">📋 COPIER ID</button>
+        <div class="help">Partage cet ID à ton adversaire !</div>
+      </div>
+      
+      <div id="joinSection" style="display:none">
+        <label for="friendId">🎯 ID DE TON ADVERSAIRE</label>
+        <input id="friendId" type="text" placeholder="Colle l'ID ici..." />
+        <button id="connectBtn" class="btn" style="margin-top:10px">SE CONNECTER</button>
+      </div>
+      
+      <button id="cancelMultiplayer" class="btn danger" style="margin-top:15px">ANNULER</button>
+    </div>
+
+    <!-- Joueurs -->
+    <div class="row">
+      <div class="col">
+        <label for="p1">🤖 PLAYER 1 (BLANC)</label>
+        <input id="p1" type="text" placeholder="Joueur 1" />
+        <div class="check">
+          <input id="assistP1" type="checkbox" checked>
+          <label for="assistP1">Assistance de visée</label>
+        </div>
+      </div>
+      <div class="col">
+        <label for="p2">⚡ PLAYER 2 (NOIR)</label>
+        <input id="p2" type="text" placeholder="Joueur 2" />
+        <div class="check">
+          <input id="assistP2" type="checkbox" checked>
+          <label for="assistP2">Assistance de visée</label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row" style="margin-top:25px">
+      <div class="col">
+        <label>🔥 NIVEAU DE DIFFICULTÉ</label>
+        <div class="stars">
+          <input type="radio" name="difficulty" id="diff1" value="1">
+          <label for="diff1">NOOB</label>
+          <input type="radio" name="difficulty" id="diff2" value="2" checked>
+          <label for="diff2">PRO</label>
+          <input type="radio" name="difficulty" id="diff3" value="3">
+          <label for="diff3">LEGEND</label>
+        </div>
+        <div class="help">NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore</div>
+      </div>
+    </div>
+    
+    <div class="row" style="margin-top:30px;align-items:center;justify-content:space-between">
+      <div class="help" style="color:var(--neon-cyan)">
+        👆 Touche une boule, tire en arrière, relâche pour DÉTRUIRE !
+      </div>
+      <button id="startBtn" class="btn">🚀 COMMENCER LE MASSACRE</button>
+    </div>
+  </div>
+
+  <!-- Zone de jeu -->
+  <div id="gameUI" style="display:none" class="game-area">
+    <div class="scores-hud">
+      <div class="player-score">
+        <span id="name1" class="player-name">Player 1</span>
+        <span id="score1" class="score-value">0</span>
+      </div>
+      <span class="vs">VS</span>
+      <div class="player-score">
+        <span id="name2" class="player-name">Player 2</span>
+        <span id="score2" class="score-value">0</span>
+      </div>
+    </div>
+    
+    <div class="board-container">
+      <div class="felt">
+        <canvas id="game" width="912" height="532"></canvas>
+        
+        <!-- HUD -->
+        <div class="hud">
+          <div class="turn-indicator" id="turnBanner">
+            <div class="turn-ball white" id="turnBall"></div>
+            <div id="turnText">PRÉPARE-TOI...</div>
+          </div>
+        </div>
+        
+        <!-- Jauge de puissance -->
+        <div class="power-meter" id="powerMeter">
+          <div class="power-fill" id="powerFill"></div>
+        </div>
+        
+        <!-- Stats en temps réel -->
+        <div class="stats-panel" id="statsPanel">
+          <div>SHOTS: <span id="shotCount">0</span></div>
+          <div>STREAK: <span id="streak">0</span></div>
+          <div>TEMPS: <span id="gameTime">00:00</span></div>
+        </div>
+        
+        <!-- Network status + Chat -->
+        <div class="network-panel" id="networkPanel">
+          <div>MODE: <span id="gameMode">LOCAL</span></div>
+          <div>PING: <span id="ping">-</span></div>
+          <div>SYNC: <span id="syncStatus">OK</span></div>
+          <button id="toggleChat" class="btn secondary" style="margin-top:10px;padding:6px 12px;font-size:11px;display:none">💬 CHAT</button>
+        </div>
+        
+        <!-- Chat P2P -->
+        <div class="chat-panel" id="chatPanel">
+          <div class="chat-header">
+            💬 CHAT P2P
+            <button id="closeChat" class="btn secondary" style="padding:4px 8px;font-size:10px">✖</button>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome">Connecté ! Commence à chatter...</div>
+          </div>
+          <div class="chat-input-group">
+            <input type="text" id="chatInput" placeholder="Tape ton message..." maxlength="100">
+            <button id="sendChat" class="btn" style="padding:8px 12px;font-size:11px">📤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlays -->
+  <div id="nextOverlay" class="overlay hidden">
+    <div class="modal">
+      <h2>🏆 MANCHE TERMINÉE</h2>
+      <p id="roundResult">Résultat...</p>
+      <button id="nextBtn" class="btn">MANCHE SUIVANTE</button>
+    </div>
+  </div>
+
+  <div id="victoryOverlay" class="overlay hidden">
+    <div class="modal">
+      <h2 id="victoryTitle">👑 VICTOIRE ÉPIQUE!</h2>
+      <p id="victorySubtitle">... domine le terrain!</p>
+      <button id="playAgainBtn" class="btn">REVANCHE!</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
+<script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
