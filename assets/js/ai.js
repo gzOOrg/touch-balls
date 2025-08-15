@@ -71,6 +71,12 @@ export class AI {
   async play() {
     if (this.isThinking) return;
     
+    // Vérifier que c'est le tour de l'IA (player 2 uniquement)
+    if (gameState.currentTurn !== 1) {
+      console.log('🤖 IA: Pas mon tour ! Je ne joue qu\'en player 2.');
+      return;
+    }
+    
     this.isThinking = true;
     
     // Message de réflexion selon le niveau
@@ -177,9 +183,17 @@ export class AI {
     const gameAnalysis = this.analyzeGameSituation();
     console.log('🧠 TERMINATOR: Situation détectée -', gameAnalysis.type, 'Urgence:', gameAnalysis.urgency);
     
+    // Vérifier que c'est bien le tour de l'IA (player 2)
+    if (gameState.currentTurn !== 1) {
+      console.log('💀 TERMINATOR: Ce n\'est pas mon tour ! Je suis player 2 uniquement.');
+      return null;
+    }
+    
     // Phase 1: Analyse immédiate des one-shots parfaits
-    // TERMINATOR ne joue qu'avec SES balles (owner === 1)
+    // TERMINATOR ne joue qu'avec SES balles (player 2 = owner 1)
     const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall && b.owner === 1);
+    console.log(`💀 TERMINATOR: Player 2 - balles disponibles:`, playableBalls.length);
+    
     if (!playableBalls.length) {
       console.log('💀 TERMINATOR: Aucune balle disponible - Situation critique');
       return null;
@@ -221,7 +235,13 @@ export class AI {
    * Calcule le meilleur coup possible (algorithme standard)
    */
   calculateBestShot() {
-    // L'IA utilise SEULEMENT ses propres balles (owner === 1)
+    // Vérifier que c'est le tour de l'IA (player 2 uniquement)
+    if (gameState.currentTurn !== 1) {
+      console.log('🤖 IA: Ce n\'est pas mon tour ! Je suis player 2 uniquement.');
+      return null;
+    }
+    
+    // L'IA utilise SEULEMENT ses propres balles (player 2 = owner 1)
     const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall && b.owner === 1);
     if (!playableBalls.length) return null;
     
@@ -1018,7 +1038,7 @@ export class AI {
     const holeX = CANVAS_WIDTH / 2;
     const holeY = CANVAS_HEIGHT / 2;
     
-    // Mes balles (IA = owner 1)
+    // Mes balles (IA = player 2 = owner 1)
     const myBalls = gameState.balls.filter(b => b.isActive && b.owner === 1);
     const enemyBalls = gameState.balls.filter(b => b.isActive && b.owner === 0);
     

@@ -1,172 +1,179 @@
-# 🎱 Billard Épique - Jeu Multijoueur Complet
+# 🎱 Epic Billiards - Le Meilleur Jeu de Billard en Ligne
 
-## 🚀 Fonctionnalités
+Bienvenue dans **Epic Billiards**, l'expérience de billard la plus avancée du web ! 
 
-- **🎮 4 modes de jeu** : Local, vs IA, Héberger, Rejoindre
-- **🤖 3 niveaux d'IA** : DUMB (facile), SMART (moyen), TERMINATOR (expert)
-- **🌐 Multijoueur P2P** : Connexion directe sans serveur via PeerJS
-- **💬 Chat intégré** : Communication en temps réel pendant les parties
-- **🎨 Design néon** : Interface cyberpunk avec effets visuels impressionnants
-- **🔊 Effets sonores** : Audio synthétisé en temps réel
-- **📱 Responsive** : Compatible desktop et mobile
+## 🌟 Fonctionnalités
 
-## ✨ Améliorations visuelles récentes
+### 🤖 IA Intelligente
+- **3 niveaux de difficulté** : DUMB, SMART, TERMINATOR
+- **TERMINATOR AI** : Intelligence artificielle ultra-avancée avec analyse situationnelle
+- **Anti-suicide** : L'IA ne peut plus se faire du mal
+- **Stratégies adaptatives** : 9 types de situations différentes
 
-- **🌟 Grille cyberpunk** : Fond avec grille lumineuse cyan
-- **💫 Effet de traînée** : Les boules laissent une trace en mouvement
-- **🎯 Visée améliorée** : Points d'impact lumineux et rebonds visualisés
-- **🎨 Rendu des boules** : Gradients sophistiqués et reflets réalistes
-- **🔥 Messages combo** : Animations "POWER SHOT!", "RED BALL!", etc.
-- **🌈 Jauge de puissance** : Gradient vert → orange → rouge
-- **⚡ Glow néon** : Effets lumineux sur le trou central et la boule rouge
+### 🌍 Support International
+**9 langues supportées** avec drapeaux :
+- 🇫🇷 Français
+- 🇬🇧 English  
+- 🇩🇪 Deutsch
+- 🇪🇸 Español
+- 🇨🇳 中文 (Mandarin)
+- 🇸🇦 العربية (Arabe)
+- 🇳🇱 Nederlands
+- 🇱🇺 Lëtzebuergesch (Luxembourgeois)
+- 🇯🇵 日本語 (Japonais)
 
-## 🌍 Langues disponibles
+### 🎮 Modes de Jeu
+- **Local** : Jouez à deux sur le même appareil
+- **vs IA** : Affrontez nos intelligences artificielles
+- **Multijoueur** : Jouez en ligne via WebRTC P2P
 
-Le jeu est disponible en plusieurs langues :
-- 🇫🇷 **Français** (par défaut)
-- 🇳🇱 **Nederlands** (Néerlandais)
+### 🎯 Physique Réaliste
+- **Simulation ultra-précise** des collisions
+- **Friction authentique** 
+- **Rebonds parfaits**
+- **Détection de trous** avancée
 
-Pour changer de langue :
-1. Cliquez sur les boutons de drapeau en haut de l'écran
-2. Le bouton actif s'illumine en néon cyan
-3. Votre choix est sauvegardé automatiquement
+### 🎪 Niveaux de Difficulté
+- **NOOB** : Trou géant pour débuter
+- **PRO** : Équilibré pour les joueurs expérimentés  
+- **LEGEND** : Mode hardcore pour les experts
 
-## 📁 Structure du projet
+## 🚀 Installation et Utilisation
 
+### Démarrage Rapide
+```bash
+# Cloner le repository
+git clone https://github.com/username/epic-billiards.git
+
+# Aller dans le dossier
+cd epic-billiards
+
+# Lancer le serveur local
+python3 -m http.server 8000
+
+# Ouvrir dans le navigateur
+open http://localhost:8000
 ```
-billard/
-├── billard.html          # Page HTML principale
+
+### Structure du Projet
+```
+epic-billiards/
+├── index.html              # Page d'accueil du site
+├── billard.html            # Jeu de billard
 ├── assets/
 │   ├── css/
-│   │   └── style.css     # Styles CSS avec thème néon
+│   │   ├── site.css        # Styles pour le site
+│   │   └── style.css       # Styles pour le jeu
 │   └── js/
-│       ├── main.js       # Contrôleur principal
-│       ├── game.js       # Moteur de jeu (physique, rendu)
-│       ├── ui.js         # Gestion de l'interface
-│       ├── ai.js         # Intelligence artificielle
-│       ├── network.js    # Système multijoueur P2P
-│       ├── sfx.js        # Effets sonores
-│       ├── constants.js  # Configuration et constantes
-│       └── utils.js      # Fonctions utilitaires
-└── README.md             # Documentation
-
+│       ├── site.js         # JavaScript du site
+│       ├── main.js         # Point d'entrée du jeu
+│       ├── game.js         # Logique de jeu
+│       ├── ai.js           # Intelligence artificielle
+│       ├── network.js      # Multijoueur P2P
+│       ├── translations.js # Système de langues
+│       └── constants.js    # Constantes du jeu
+└── README.md
 ```
 
-## ✅ Architecture modulaire ES6
+## 🎯 Guide de Jeu
 
-### 1. **`main.js`** - Contrôleur principal
-- Gestion des modes de jeu
-- Initialisation des modules
-- Orchestration des événements
-- Boucle de jeu principale
+### Contrôles
+- **Souris/Tactile** : Cliquez et glissez pour viser
+- **Puissance** : Plus vous tirez loin, plus le tir est puissant
+- **Objectif** : Mettez la balle rouge dans le trou en utilisant vos balles
 
-### 2. **`game.js`** - Moteur de jeu
-- Physique réaliste (collisions, friction, rebonds)
-- Rendu Canvas optimisé
-- Gestion des interactions (souris/tactile)
-- Détection de victoire
+### Règles
+1. Chaque joueur contrôle ses balles (blanches ou noires)
+2. Vous ne pouvez frapper QUE vos propres balles
+3. L'objectif est de mettre la balle rouge dans le trou
+4. Le premier à réussir gagne la manche
 
-### 3. **`ai.js`** - Intelligence artificielle
-- **DUMB** : Tirs aléatoires, réflexion rapide
-- **SMART** : Stratégie basique, précision moyenne
-- **TERMINATOR** : Calculs parfaits, quasi-imbattable
+### Modes IA
+- **DUMB** : IA basique pour débuter
+- **SMART** : IA intelligente avec stratégies
+- **TERMINATOR** : IA ultra-avancée avec :
+  - Analyse situationnelle (9 types de situations)
+  - Simulation de millions de trajectoires
+  - Planification multi-étapes
+  - Détection de combos complexes
+  - Stratégies adaptatives
 
-### 4. **`network.js`** - Multijoueur P2P
-- Connexion directe via WebRTC/PeerJS
-- Synchronisation en temps réel
-- Chat intégré
-- Gestion de la latence (ping/pong)
+## 🛠️ Technologies Utilisées
 
-### 5. **`ui.js`** - Interface utilisateur
-- Gestion des éléments DOM
-- Animations et transitions
-- Notifications (achievements)
-- Mise à jour des scores
+- **HTML5 Canvas** pour le rendu du jeu
+- **JavaScript ES6+** pour la logique
+- **CSS3** avec animations et gradients
+- **WebRTC** pour le multijoueur P2P
+- **Orbitron Font** pour le style futuriste
 
-### 6. **`sfx.js`** - Système audio
-- Sons synthétisés en temps réel
-- Effets de collision dynamiques
-- Fanfares de victoire
-- Compatible avec tous les navigateurs
+## 🎨 Fonctionnalités Avancées
 
-### 7. **`constants.js`** & **`utils.js`**
-- Configuration centralisée
-- Fonctions mathématiques
-- Helpers réutilisables
+### IA TERMINATOR
+L'IA la plus avancée avec :
+- **Analyse situationnelle** : Détecte 9 types de situations différentes
+- **Stratégies spécialisées** : Mode urgence, agressif, défensif, perfection
+- **Anti-suicide** : Pénalité massive (-10000 points) pour éviter l'auto-destruction
+- **Précision ultra-fine** : Analyse jusqu'à 0.05° d'angle
+- **Simulation avancée** : Jusqu'à 2000 étapes de simulation physique
 
-## 🎮 Comment jouer
+### Multijoueur P2P
+- **WebRTC** pour connexion directe peer-to-peer
+- **Partage d'ID** simple pour inviter des amis
+- **Synchronisation** en temps réel des actions
+- **Chat** intégré (prévu)
 
-1. **Démarrer un serveur local** (nécessaire pour les modules ES6) :
-   ```bash
-   python3 -m http.server 8000
-   ```
+### Interface Responsive
+- **Mobile-first** design
+- **Contrôles tactiles** optimisés
+- **Adaptation automatique** à tous les écrans
+- **Performance** optimisée
 
-2. **Ouvrir le jeu** : http://localhost:8000/billard.html
+## 🐛 Debug et Console
 
-3. **Choisir un mode** :
-   - **LOCAL** : 2 joueurs sur le même appareil
-   - **vs IA** : Affronter l'ordinateur (3 niveaux)
-   - **HÉBERGER** : Créer une partie en ligne
-   - **REJOINDRE** : Se connecter à une partie
+Le jeu affiche des informations détaillées dans la console :
+- **TERMINATOR** : Analyse des stratégies et scores
+- **Physique** : Collisions et trajectoires  
+- **Réseau** : État des connexions P2P
+- **Performance** : FPS et temps de calcul
 
-4. **Contrôles** :
-   - Cliquer-glisser sur une boule pour viser
-   - Relâcher pour tirer (puissance = distance)
-   - Chat : Disponible en multijoueur
+## 🎯 Roadmap
 
-## 🎯 Règles du jeu
+### Version Future
+- [ ] **Tournois en ligne**
+- [ ] **Classements globaux** 
+- [ ] **Personnalisation** des balles et tables
+- [ ] **Modes de jeu** supplémentaires (8-ball, 9-ball)
+- [ ] **Replay system** pour revoir les parties
+- [ ] **IA adaptatrice** qui apprend de vos habitudes
 
-- **Objectif principal** : Faire tomber la boule rouge dans le trou central
-- **Objectif secondaire** : Éliminer toutes les boules adverses
-- **Tour par tour** : Les blancs commencent
-- **Assistance** : Ligne de visée (désactivée en mode LEGEND)
+## 📱 Compatibilité
 
-## 🌐 Multijoueur P2P
+- ✅ **Chrome/Chromium** (recommandé)
+- ✅ **Firefox**
+- ✅ **Safari** 
+- ✅ **Edge**
+- ✅ **Mobile** (iOS/Android)
 
-1. **Héberger** :
-   - Cliquer sur HÉBERGER
-   - Copier l'ID généré
-   - Partager avec un ami
+## 🤝 Contribution
 
-2. **Rejoindre** :
-   - Cliquer sur REJOINDRE
-   - Coller l'ID de l'hôte
-   - Cliquer sur SE CONNECTER
+Les contributions sont les bienvenues ! 
 
-## 🏆 Niveaux de difficulté
+1. Fork le projet
+2. Créez une branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit vos changements (`git commit -m 'Add AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
 
-- **NOOB** : Trou 50% plus grand, assistance complète
-- **PRO** : Taille normale, assistance disponible
-- **LEGEND** : Trou 25% plus petit, aucune assistance
+## 📄 Licence
 
-## 🛠️ Technologies utilisées
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-- **HTML5 Canvas** : Rendu graphique
-- **JavaScript ES6** : Modules et classes modernes
-- **CSS3** : Animations et effets visuels
-- **PeerJS** : Connexions P2P via WebRTC
-- **Web Audio API** : Sons synthétisés
+## 🎯 Easter Eggs
 
-## 📈 Performances
-
-- **60 FPS** : Animation fluide
-- **Optimisé mobile** : Touch et responsive
-- **Léger** : Aucune dépendance lourde
-- **P2P** : Pas besoin de serveur dédié
-
-## 🚧 Améliorations futures
-
-- [ ] Mode tournoi
-- [ ] Classements en ligne
-- [ ] Plus de types de boules
-- [ ] Effets de particules
-- [ ] Replays de parties
-- [ ] Support gamepad
-
-## 📝 Licence
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Essayez le **Konami Code** sur la page d'accueil ! ⬆️⬆️⬇️⬇️⬅️➡️⬅️➡️BA
 
 ---
 
-**Développé avec ❤️ et beaucoup de néon 🌟**
+**Développé avec ❤️ et beaucoup de ☕**
+
+🎱 **Jouez maintenant sur [Epic Billiards](http://localhost:8000) !**

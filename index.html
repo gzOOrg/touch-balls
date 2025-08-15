@@ -1,40 +1,336 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=billard.html">
-    <title>🎱 Billard Épique - Redirection</title>
-    <style>
-        body {
-            background: #0a0a0a;
-            color: #00ffff;
-            font-family: monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        a {
-            color: #00ffff;
-            text-decoration: none;
-            padding: 10px 20px;
-            border: 2px solid #00ffff;
-            border-radius: 25px;
-            transition: all 0.3s;
-        }
-        a:hover {
-            background: #00ffff;
-            color: #000;
-            box-shadow: 0 0 20px #00ffff;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎱 Epic Billiards - Le Meilleur Jeu de Billard en Ligne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎱</text></svg>">
 </head>
 <body>
-    <div>
-        <h1>🎱 Redirection en cours...</h1>
-        <p>Si vous n'êtes pas redirigé automatiquement, <a href="billard.html">cliquez ici</a></p>
+  <!-- Header de navigation -->
+  <header class="navbar">
+    <div class="container">
+      <div class="nav-brand">
+        <span class="logo">🎱</span>
+        <span class="brand-text">Epic Billiards</span>
+      </div>
+      
+      <nav class="nav-menu">
+        <a href="#home" class="nav-link active">Accueil</a>
+        <a href="#features" class="nav-link">Fonctionnalités</a>
+        <a href="#game" class="nav-link">Jouer</a>
+        <a href="#about" class="nav-link">À propos</a>
+      </nav>
+      
+      <div class="nav-actions">
+        <button class="btn-primary" onclick="window.location.href='billard.html'">
+          🎮 JOUER MAINTENANT
+        </button>
+      </div>
     </div>
+  </header>
+
+  <!-- Section Hero -->
+  <section id="home" class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="title-main">EPIC BILLIARDS</span>
+          <span class="title-sub">Le billard réinventé</span>
+        </h1>
+        
+        <p class="hero-description">
+          Découvrez l'expérience de billard la plus avancée du web ! 
+          Affrontez des IA intelligentes, jouez en multijoueur et profitez d'une physique ultra-réaliste.
+        </p>
+        
+        <div class="hero-actions">
+          <button class="btn-hero-primary" onclick="window.location.href='billard.html'">
+            🎱 COMMENCER À JOUER
+          </button>
+          <button class="btn-hero-secondary" onclick="scrollToSection('features')">
+            ✨ DÉCOUVRIR LES FONCTIONNALITÉS
+          </button>
+        </div>
+        
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">9</span>
+            <span class="stat-label">Langues</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">3</span>
+            <span class="stat-label">Niveaux d'IA</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Plaisir</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hero-game-preview">
+        <div class="game-mockup">
+          <div class="mockup-screen">
+            <div class="felt-preview">
+              <div class="ball ball-white"></div>
+              <div class="ball ball-black"></div>
+              <div class="ball ball-red"></div>
+              <div class="hole"></div>
+            </div>
+          </div>
+          <div class="mockup-glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Fonctionnalités -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2 class="section-title">
+        <span class="title-icon">⚡</span>
+        Fonctionnalités Épiques
+      </h2>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3 class="feature-title">IA TERMINATOR</h3>
+          <p class="feature-description">
+            Affrontez notre IA la plus avancée ! TERMINATOR analyse des millions de trajectoires 
+            et s'adapte à chaque situation de jeu.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">Ultra-Intelligent</span>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h3 class="feature-title">9 LANGUES</h3>
+          <p class="feature-description">
+            Jouez dans votre langue préférée ! Français, English, Deutsch, Español, 
+            中文, العربية, Nederlands, Lëtzebuergesch, 日本語.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">Multilingue</span>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">PHYSIQUE RÉALISTE</h3>
+          <p class="feature-description">
+            Profitez d'une simulation physique ultra-précise avec collisions réalistes, 
+            friction authentique et rebonds parfaits.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">Ultra-Réaliste</span>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3 class="feature-title">MULTIJOUEUR</h3>
+          <p class="feature-description">
+            Défiez vos amis en ligne ! Partagez simplement votre ID de partie 
+            et jouez ensemble de n'importe où.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">En Ligne</span>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎪</div>
+          <h3 class="feature-title">3 DIFFICULTÉS</h3>
+          <p class="feature-description">
+            De NOOB à LEGEND, choisissez votre niveau de défi ! 
+            Trou géant, équilibré ou mode hardcore.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">Progressive</span>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3 class="feature-title">RESPONSIVE</h3>
+          <p class="feature-description">
+            Jouez sur PC, tablette ou mobile ! Interface adaptative 
+            et contrôles tactiles optimisés.
+          </p>
+          <div class="feature-highlight">
+            <span class="highlight-text">Partout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section Jeu -->
+  <section id="game" class="game-section">
+    <div class="container">
+      <h2 class="section-title">
+        <span class="title-icon">🎮</span>
+        Prêt à Jouer ?
+      </h2>
+      
+      <div class="game-modes">
+        <div class="game-mode">
+          <div class="mode-icon">🤖</div>
+          <h3 class="mode-title">vs IA</h3>
+          <p class="mode-description">
+            Affrontez nos IA intelligentes dans des parties intenses ! 
+            Choisissez votre niveau de difficulté.
+          </p>
+          <button class="btn-mode" onclick="window.location.href='billard.html'">
+            DÉFIER L'IA
+          </button>
+        </div>
+        
+        <div class="game-mode">
+          <div class="mode-icon">👥</div>
+          <h3 class="mode-title">LOCAL</h3>
+          <p class="mode-description">
+            Jouez à deux sur le même appareil ! 
+            Parfait pour défier famille et amis.
+          </p>
+          <button class="btn-mode" onclick="window.location.href='billard.html'">
+            JOUER LOCAL
+          </button>
+        </div>
+        
+        <div class="game-mode">
+          <div class="mode-icon">🌐</div>
+          <h3 class="mode-title">EN LIGNE</h3>
+          <p class="mode-description">
+            Connectez-vous avec des joueurs du monde entier ! 
+            Partagez votre ID de partie.
+          </p>
+          <button class="btn-mode" onclick="window.location.href='billard.html'">
+            JOUER EN LIGNE
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section À propos -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2 class="section-title">
+        <span class="title-icon">💎</span>
+        À Propos d'Epic Billiards
+      </h2>
+      
+      <div class="about-content">
+        <div class="about-text">
+          <h3>Le billard du futur</h3>
+          <p>
+            Epic Billiards repousse les limites du jeu de billard en ligne. 
+            Développé avec les dernières technologies web, notre jeu offre une expérience 
+            immersive et compétitive inégalée.
+          </p>
+          
+          <h3>Technologie avancée</h3>
+          <p>
+            Notre moteur physique propriétaire simule avec précision les collisions, 
+            la friction et les rebonds. L'IA TERMINATOR utilise des algorithmes de pointe 
+            pour analyser des millions de trajectoires en temps réel.
+          </p>
+          
+          <h3>Communauté mondiale</h3>
+          <p>
+            Avec le support de 9 langues et le multijoueur en ligne, 
+            Epic Billiards rassemble une communauté mondiale de passionnés de billard.
+          </p>
+        </div>
+        
+        <div class="about-features">
+          <div class="tech-feature">
+            <span class="tech-icon">⚡</span>
+            <span class="tech-name">HTML5 Canvas</span>
+          </div>
+          <div class="tech-feature">
+            <span class="tech-icon">🎯</span>
+            <span class="tech-name">Physique Avancée</span>
+          </div>
+          <div class="tech-feature">
+            <span class="tech-icon">🌐</span>
+            <span class="tech-name">WebRTC P2P</span>
+          </div>
+          <div class="tech-feature">
+            <span class="tech-icon">🤖</span>
+            <span class="tech-name">IA Multi-Niveaux</span>
+          </div>
+          <div class="tech-feature">
+            <span class="tech-icon">📱</span>
+            <span class="tech-name">Responsive Design</span>
+          </div>
+          <div class="tech-feature">
+            <span class="tech-icon">🎨</span>
+            <span class="tech-name">Animations CSS3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <span class="logo">🎱</span>
+          <span class="brand-text">Epic Billiards</span>
+          <p class="footer-description">
+            Le meilleur jeu de billard en ligne. Gratuit, sans inscription.
+          </p>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Jeu</h4>
+          <a href="billard.html">Jouer Maintenant</a>
+          <a href="#features">Fonctionnalités</a>
+          <a href="#game">Modes de Jeu</a>
+        </div>
+        
+        <div class="footer-links">
+          <h4>Support</h4>
+          <a href="#about">À Propos</a>
+          <a href="https://github.com" target="_blank">Code Source</a>
+          <a href="mailto:contact@example.com">Contact</a>
+        </div>
+        
+        <div class="footer-social">
+          <h4>Langues Supportées</h4>
+          <div class="language-flags">
+            <span class="flag" title="Français">🇫🇷</span>
+            <span class="flag" title="English">🇬🇧</span>
+            <span class="flag" title="Deutsch">🇩🇪</span>
+            <span class="flag" title="Español">🇪🇸</span>
+            <span class="flag" title="中文">🇨🇳</span>
+            <span class="flag" title="العربية">🇸🇦</span>
+            <span class="flag" title="Nederlands">🇳🇱</span>
+            <span class="flag" title="Lëtzebuergesch">🇱🇺</span>
+            <span class="flag" title="日本語">🇯🇵</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2024 Epic Billiards. Fait avec ❤️ et beaucoup de ☕</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/site.js"></script>
 </body>
 </html>

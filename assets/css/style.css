@@ -130,29 +130,32 @@ body{
 /* Nouveaux boutons de langue */
 .language-buttons {
   display: flex;
-  gap: 5px;
+  gap: 3px;
   background: rgba(0,0,0,0.6);
   padding: 5px;
   border-radius: 25px;
   border: 2px solid rgba(0,255,255,0.3);
+  flex-wrap: wrap;
+  max-width: 600px;
+  justify-content: center;
 }
 
 .lang-btn {
   background: rgba(0,0,0,0.8);
   border: 2px solid transparent;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
+  border-radius: 18px;
+  padding: 6px 10px;
+  font-size: 12px;
   font-weight: bold;
   color: rgba(255,255,255,0.7);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   position: relative;
   overflow: hidden;
-  min-width: 80px;
+  min-width: 55px;
 }
 
 .lang-btn:hover {
@@ -180,7 +183,7 @@ body{
 }
 
 .lang-btn .flag {
-  font-size: 20px;
+  font-size: 16px;
   display: inline-block;
   animation: wave 3s ease-in-out infinite;
 }
