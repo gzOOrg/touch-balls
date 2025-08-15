@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Language system
   setupLanguageButtons();
   
-  // Load saved language or default to French
-  const savedLang = localStorage.getItem('epic-billiards-language') || 'fr';
+  // Load saved language or default to French - use same key as game
+  const savedLang = localStorage.getItem('billardLanguage') || 'fr';
   setLanguage(savedLang);
 });
 
@@ -843,8 +843,8 @@ function setupLanguageButtons() {
  * Définir la langue et traduire la page
  */
 function setLanguage(lang) {
-  // Sauvegarder la langue
-  localStorage.setItem('epic-billiards-language', lang);
+  // Sauvegarder la langue - use same key as game
+  localStorage.setItem('billardLanguage', lang);
   
   // Mettre à jour les boutons actifs
   const langButtons = document.querySelectorAll('.hero-lang-btn');
@@ -876,6 +876,15 @@ function translatePage(lang) {
   // Les éléments sont maintenant traduits via data-translate, pas besoin de sélecteurs CSS spécifiques
   
   console.log(`🌍 Page traduite en ${lang.toUpperCase()}`);
+  
+  // Notify game that language has changed (if game is loaded in another tab/frame)
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'languageChange', language: lang }, '*');
+    }
+  } catch (e) {
+    // Ignore cross-origin errors
+  }
 }
 
 /**
@@ -892,33 +901,7 @@ function setupLanguageButtons() {
   });
 }
 
-/**
- * Définir la langue
- */
-function setLanguage(lang) {
-  // Sauvegarder la langue choisie
-  localStorage.setItem('epic-billiards-language', lang);
-  
-  // Mettre à jour les boutons actifs
-  updateActiveLanguageButton(lang);
-  
-  // Appliquer les traductions
-  applyTranslations(lang);
-}
 
-/**
- * Mettre à jour le bouton de langue actif
- */
-function updateActiveLanguageButton(lang) {
-  const langButtons = document.querySelectorAll('.nav-lang-btn');
-  
-  langButtons.forEach(button => {
-    button.classList.remove('active');
-    if (button.getAttribute('data-lang') === lang) {
-      button.classList.add('active');
-    }
-  });
-}
 
 /**
  * Appliquer les traductions
