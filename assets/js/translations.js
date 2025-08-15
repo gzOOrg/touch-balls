@@ -149,7 +149,7 @@ export const translations = {
     difficultyHelp: "BEGINNER: Reuzengat • PRO: Evenwichtig • LEGENDE: Hardcore modus",
     gameInstructions: "👆 Raak een bal aan, trek terug, laat los om te VERNIETIGEN!",
     startGame: "BEGIN HET BLOEDBAD",
-    aimAssist: "Richtassistentie"
+    aimAssist: "Richthulp"
   }
 };
 
