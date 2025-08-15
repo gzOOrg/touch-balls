@@ -154,7 +154,7 @@ billard/
 
 ## 📝 Licence
 
-Ce projet est un exemple éducatif de jeu web moderne utilisant les dernières technologies JavaScript.
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ---
 
