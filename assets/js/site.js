@@ -15,6 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Parallax effects
   setupParallax();
+  
+  // Language system
+  setupLanguageButtons();
+  
+  // Load saved language or default to French
+  const savedLang = localStorage.getItem('epic-billiards-language') || 'fr';
+  setLanguage(savedLang);
 });
 
 /**
@@ -390,3 +397,185 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Fonction globale pour le bouton hero
 window.scrollToSection = scrollToSection;
+
+/**
+ * Configuration des boutons de langue
+ */
+function setupLanguageButtons() {
+  const langButtons = document.querySelectorAll('.nav-lang-btn');
+  
+  langButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const lang = this.getAttribute('data-lang');
+      setLanguage(lang);
+    });
+  });
+}
+
+/**
+ * Définir la langue
+ */
+function setLanguage(lang) {
+  // Sauvegarder la langue choisie
+  localStorage.setItem('epic-billiards-language', lang);
+  
+  // Mettre à jour les boutons actifs
+  updateActiveLanguageButton(lang);
+  
+  // Appliquer les traductions
+  applyTranslations(lang);
+}
+
+/**
+ * Mettre à jour le bouton de langue actif
+ */
+function updateActiveLanguageButton(lang) {
+  const langButtons = document.querySelectorAll('.nav-lang-btn');
+  
+  langButtons.forEach(button => {
+    button.classList.remove('active');
+    if (button.getAttribute('data-lang') === lang) {
+      button.classList.add('active');
+    }
+  });
+}
+
+/**
+ * Appliquer les traductions
+ */
+function applyTranslations(lang) {
+  const translations = getTranslations(lang);
+  
+  // Titre principal
+  const titleMain = document.querySelector('.title-main');
+  if (titleMain) titleMain.textContent = translations.title;
+  
+  // Sous-titre
+  const titleSub = document.querySelector('.title-sub');
+  if (titleSub) titleSub.textContent = translations.subtitle;
+  
+  // Description
+  const heroDescription = document.querySelector('.hero-description');
+  if (heroDescription) heroDescription.textContent = translations.description;
+  
+  // Bouton principal
+  const heroBtn = document.querySelector('.btn-hero-primary');
+  if (heroBtn) heroBtn.textContent = translations.playButton;
+  
+  // Stats
+  const statLabels = document.querySelectorAll('.stat-label');
+  if (statLabels.length >= 3) {
+    statLabels[0].textContent = translations.languages;
+    statLabels[1].textContent = translations.aiLevels;
+    statLabels[2].textContent = translations.fun;
+  }
+  
+  // Navigation
+  const navLinks = document.querySelectorAll('.nav-link');
+  if (navLinks.length >= 4) {
+    navLinks[0].textContent = translations.home;
+    navLinks[1].textContent = translations.features;
+    navLinks[2].textContent = translations.play;
+    navLinks[3].textContent = translations.about;
+  }
+  
+  // Section titles et autres éléments...
+  updateSectionTitles(translations);
+}
+
+/**
+ * Mettre à jour les titres de sections
+ */
+function updateSectionTitles(translations) {
+  // Titre fonctionnalités
+  const featuresTitle = document.querySelector('#features .section-title');
+  if (featuresTitle) {
+    featuresTitle.innerHTML = `<span class="title-icon">⚡</span>${translations.featuresTitle}`;
+  }
+  
+  // Titre jeu
+  const gameTitle = document.querySelector('#game .section-title');
+  if (gameTitle) {
+    gameTitle.innerHTML = `<span class="title-icon">🎮</span>${translations.gameTitle}`;
+  }
+  
+  // Titre à propos
+  const aboutTitle = document.querySelector('#about .section-title');
+  if (aboutTitle) {
+    aboutTitle.innerHTML = `<span class="title-icon">💎</span>${translations.aboutTitle}`;
+  }
+}
+
+/**
+ * Traductions
+ */
+function getTranslations(lang) {
+  const translations = {
+    fr: {
+      title: 'EPIC BILLIARDS',
+      subtitle: 'Le billard réinventé',
+      description: 'Découvrez l\'expérience de billard la plus avancée du web ! Affrontez des IA intelligentes, jouez en multijoueur et profitez d\'une physique ultra-réaliste.',
+      playButton: '🎱 JOUER MAINTENANT',
+      languages: 'Langues',
+      aiLevels: 'Niveaux d\'IA',
+      fun: 'Plaisir',
+      home: 'Accueil',
+      features: 'Fonctionnalités',
+      play: 'Jouer',
+      about: 'À propos',
+      featuresTitle: 'Fonctionnalités Épiques',
+      gameTitle: 'Prêt à Jouer ?',
+      aboutTitle: 'À Propos d\'Epic Billiards'
+    },
+    en: {
+      title: 'EPIC BILLIARDS',
+      subtitle: 'Billiards Reinvented',
+      description: 'Discover the most advanced billiards experience on the web! Challenge intelligent AIs, play multiplayer and enjoy ultra-realistic physics.',
+      playButton: '🎱 PLAY NOW',
+      languages: 'Languages',
+      aiLevels: 'AI Levels',
+      fun: 'Fun',
+      home: 'Home',
+      features: 'Features',
+      play: 'Play',
+      about: 'About',
+      featuresTitle: 'Epic Features',
+      gameTitle: 'Ready to Play?',
+      aboutTitle: 'About Epic Billiards'
+    },
+    de: {
+      title: 'EPIC BILLIARDS',
+      subtitle: 'Billard Neu Erfunden',
+      description: 'Entdecken Sie das fortschrittlichste Billard-Erlebnis im Web! Fordern Sie intelligente KIs heraus, spielen Sie Multiplayer und genießen Sie ultra-realistische Physik.',
+      playButton: '🎱 JETZT SPIELEN',
+      languages: 'Sprachen',
+      aiLevels: 'KI-Level',
+      fun: 'Spaß',
+      home: 'Startseite',
+      features: 'Funktionen',
+      play: 'Spielen',
+      about: 'Über uns',
+      featuresTitle: 'Epische Funktionen',
+      gameTitle: 'Bereit zu Spielen?',
+      aboutTitle: 'Über Epic Billiards'
+    },
+    nl: {
+      title: 'EPIC BILLIARDS',
+      subtitle: 'Biljart Heruitgevonden',
+      description: 'Ontdek de meest geavanceerde biljartervaring op het web! Daag intelligente AI\'s uit, speel multiplayer en geniet van ultra-realistische fysica.',
+      playButton: '🎱 NU SPELEN',
+      languages: 'Talen',
+      aiLevels: 'AI-niveaus',
+      fun: 'Plezier',
+      home: 'Home',
+      features: 'Functies',
+      play: 'Spelen',
+      about: 'Over ons',
+      featuresTitle: 'Epische Functies',
+      gameTitle: 'Klaar om te Spelen?',
+      aboutTitle: 'Over Epic Billiards'
+    }
+  };
+  
+  return translations[lang] || translations.fr;
+}

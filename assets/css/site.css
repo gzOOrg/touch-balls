@@ -111,13 +111,148 @@ body {
   width: 100%;
 }
 
+/* Navigation Greetings */
+.nav-greetings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.greeting {
+  color: var(--text-gray);
+  transition: all 0.3s ease;
+  animation: colorShift 3s infinite alternate;
+}
+
+.greeting:hover {
+  color: var(--primary-color);
+  text-shadow: var(--shadow-neon);
+  transform: scale(1.1);
+}
+
+.neon-dot {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+  animation: neonPulse 2s infinite;
+  text-shadow: 
+    0 0 5px var(--accent-color),
+    0 0 10px var(--accent-color),
+    0 0 15px var(--accent-color);
+}
+
+@keyframes neonPulse {
+  0%, 100% { 
+    opacity: 1;
+    text-shadow: 
+      0 0 5px var(--accent-color),
+      0 0 10px var(--accent-color),
+      0 0 15px var(--accent-color);
+  }
+  50% { 
+    opacity: 0.7;
+    text-shadow: 
+      0 0 2px var(--accent-color),
+      0 0 5px var(--accent-color),
+      0 0 8px var(--accent-color);
+  }
+}
+
+@keyframes colorShift {
+  0% { color: var(--text-gray); }
+  25% { color: var(--primary-color); }
+  50% { color: var(--secondary-color); }
+  75% { color: var(--accent-color); }
+  100% { color: var(--text-gray); }
+}
+
 /* Hero Language Buttons */
 .hero-language-buttons {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 15px;
   margin-bottom: 30px;
+}
+
+.hero-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2));
+  border: 2px solid rgba(0,255,255,0.5);
+  border-radius: 25px;
+  color: var(--text-light);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-lang-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.hero-lang-btn:hover::before {
+  left: 100%;
+}
+
+.hero-lang-btn:hover {
+  background: linear-gradient(135deg, rgba(0,255,255,0.4), rgba(255,0,255,0.4));
+  border-color: var(--primary-color);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 
+    0 8px 25px rgba(0,255,255,0.4),
+    0 0 20px rgba(255,0,255,0.3);
+  text-shadow: 
+    0 0 10px var(--primary-color),
+    0 0 20px var(--secondary-color);
+}
+
+.hero-lang-btn.active {
+  background: var(--gradient-primary);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-neon);
+  animation: neonGlow 2s infinite alternate;
+}
+
+@keyframes neonGlow {
+  0% { 
+    box-shadow: 
+      0 0 20px rgba(0,255,255,0.5),
+      0 0 30px rgba(0,255,255,0.3),
+      0 0 40px rgba(0,255,255,0.1);
+  }
+  100% { 
+    box-shadow: 
+      0 0 30px rgba(0,255,255,0.8),
+      0 0 40px rgba(0,255,255,0.5),
+      0 0 50px rgba(0,255,255,0.3);
+  }
+}
+
+.hero-lang-btn .flag {
+  font-size: 18px;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+}
+
+.hero-lang-btn .lang-code {
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
 .nav-lang-btn {
