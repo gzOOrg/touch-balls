@@ -654,12 +654,194 @@ canvas{
   100%{transform:translateX(100%)}
 }
 
+/* Écran de victoire amélioré */
+.confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.victory-modal {
+  background: linear-gradient(135deg, rgba(10,10,10,0.98) 0%, rgba(20,20,20,0.98) 100%);
+  border: 3px solid var(--neon-yellow);
+  box-shadow: 0 0 50px var(--neon-yellow), inset 0 0 30px rgba(255,215,0,0.2);
+  padding: 40px;
+  min-width: 500px;
+  animation: victoryAppear 0.5s ease-out;
+  position: relative;
+  overflow: visible;
+}
+
+@keyframes victoryAppear {
+  from {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.victory-crown-animation {
+  font-size: 100px;
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: crownFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateX(-50%) translateY(0) rotate(-5deg); }
+  50% { transform: translateX(-50%) translateY(-10px) rotate(5deg); }
+}
+
+.victory-title-epic {
+  font-size: 48px;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 30px var(--neon-yellow), 0 0 60px var(--neon-yellow);
+  margin: 20px 0;
+  animation: titlePulse 1.5s ease-in-out infinite;
+  letter-spacing: 4px;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.victory-subtitle {
+  font-size: 24px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 20px var(--neon-cyan);
+  margin-bottom: 30px;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.victory-stats-container {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  margin: 30px 0 40px;
+  animation: fadeInUp 0.8s ease-out 0.5s both;
+}
+
+.victory-stat {
+  text-align: center;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.1);
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.victory-stat:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,255,255,0.3);
+  border-color: var(--neon-cyan);
+}
+
+.stat-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.victory-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  animation: fadeInUp 0.8s ease-out 0.7s both;
+}
+
+.btn.large {
+  font-size: 20px;
+  padding: 15px 40px;
+  border-radius: 30px;
+}
+
+.btn.pulse {
+  animation: buttonPulse 2s ease-in-out infinite;
+}
+
+@keyframes buttonPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px var(--neon-yellow);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px var(--neon-yellow), 0 0 60px var(--neon-yellow);
+  }
+}
+
 @media (max-width: 768px) {
   .header{flex-direction:column;gap:15px}
   .brand{font-size:20px}
   .row{flex-direction:column}
   .stars{justify-content:center}
   .scores-hud{flex-direction:column;gap:15px}
+  
+  /* Écran de victoire responsive */
+  .victory-modal {
+    min-width: 90%;
+    padding: 30px 20px;
+  }
+  .victory-title-epic {
+    font-size: 32px;
+  }
+  .victory-crown-animation {
+    font-size: 70px;
+    top: -60px;
+  }
+  .victory-stats-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .victory-stat {
+    width: 100%;
+  }
+  .victory-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  .btn.large {
+    width: 100%;
+  }
   .modal{padding:25px}
   .modal h2{font-size:24px}
   .stats-panel,.network-panel{position:static;margin:10px 0}

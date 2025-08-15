@@ -315,25 +315,68 @@ window.updateGameScores = function(roundsWon) {
 /**
  * Gère la fin d'une partie
  */
-function handleMatchEnd(winner) {
+async function handleMatchEnd(winner) {
   console.log('🏆 Partie terminée ! Gagnant :', winner);
   
-  // Afficher un écran de victoire
-  const winnerName = players[winner].name;
-  showAchievement(`🏆 ${winnerName} GAGNE LA PARTIE ! 🏆`);
+  // Importer dynamiquement le système de confettis
+  const { confettiSystem } = await import('./confetti.js');
   
-  // Afficher un bouton pour rejouer
+  // Préparer les données de victoire
+  const winnerName = players[winner].name;
+  const loserName = players[1 - winner].name;
+  const finalScore = `${gameState.roundsWon[0]} - ${gameState.roundsWon[1]}`;
+  const duration = Date.now() - gameState.gameStartTime;
+  const minutes = Math.floor(duration / 60000);
+  const seconds = Math.floor((duration % 60000) / 1000);
+  const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  // Mettre à jour l'écran de victoire
+  document.getElementById('victoryTitle').textContent = '🏆 VICTOIRE ÉPIQUE! 🏆';
+  document.getElementById('victorySubtitle').textContent = `${winnerName} domine ${loserName}!`;
+  document.getElementById('finalScore').textContent = finalScore;
+  document.getElementById('totalShots').textContent = gameState.totalShots;
+  document.getElementById('gameDuration').textContent = timeStr;
+  
+  // Afficher l'écran de victoire avec animation
   setTimeout(() => {
-    if (confirm(`${winnerName} a gagné ! Voulez-vous rejouer ?`)) {
-      startMatch();
-      lastDisplayedTurn = -1;
-      players[0].wins = 0;
-      players[1].wins = 0;
-      updateScores(players);
-    } else {
-      goHome();
-    }
-  }, 2000);
+    document.getElementById('victoryOverlay').classList.remove('hidden');
+    confettiSystem.start();
+    sfx.victory();
+    
+    // Sons de célébration supplémentaires
+    setTimeout(() => sfx.epic(), 500);
+    setTimeout(() => sfx.epic(), 1000);
+  }, 1000);
+  
+  // Gérer les boutons
+  const playAgainHandler = () => {
+    confettiSystem.stop();
+    document.getElementById('victoryOverlay').classList.add('hidden');
+    startMatch();
+    lastDisplayedTurn = -1;
+    players[0].wins = 0;
+    players[1].wins = 0;
+    updateScores(players);
+    ui.playAgain.removeEventListener('click', playAgainHandler);
+    ui.homeFromVictory.removeEventListener('click', homeHandler);
+  };
+  
+  const homeHandler = () => {
+    confettiSystem.stop();
+    document.getElementById('victoryOverlay').classList.add('hidden');
+    goHome();
+    ui.playAgain.removeEventListener('click', playAgainHandler);
+    ui.homeFromVictory.removeEventListener('click', homeHandler);
+  };
+  
+  // Ajouter les écouteurs d'événements temporaires
+  ui.playAgain = document.getElementById('playAgainBtn');
+  ui.homeFromVictory = document.getElementById('homeFromVictoryBtn');
+  
+  if (ui.playAgain && ui.homeFromVictory) {
+    ui.playAgain.addEventListener('click', playAgainHandler);
+    ui.homeFromVictory.addEventListener('click', homeHandler);
+  }
 }
 
 /**

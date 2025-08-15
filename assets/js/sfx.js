@@ -114,11 +114,20 @@ class SoundEffects {
   }
 
   /**
-   * Son de victoire
+   * Son de victoire épique
    */
   victory() {
+    // Fanfare de victoire en plusieurs accords
     setTimeout(() => this.playChord([523, 659, 784, 1047], 0.8, 0.4), 0);
     setTimeout(() => this.playChord([659, 784, 988, 1319], 0.8, 0.4), 400);
+    setTimeout(() => this.playChord([784, 988, 1175, 1568], 0.9, 0.5), 800);
+    setTimeout(() => this.playChord([523, 784, 1047, 1568], 1.0, 0.8), 1200);
+    
+    // Notes individuelles pour la mélodie
+    setTimeout(() => this.playTone(1047, 0.5, 0.15), 1600);
+    setTimeout(() => this.playTone(1319, 0.5, 0.15), 1750);
+    setTimeout(() => this.playTone(1568, 0.5, 0.15), 1900);
+    setTimeout(() => this.playTone(2093, 0.8, 0.6), 2050);
   }
 }
 

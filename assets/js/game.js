@@ -880,13 +880,11 @@ export function handleRoundEnd() {
     // Vérifier si la partie est terminée (2 manches gagnantes)
     if (gameState.roundsWon[gameState.roundWinner] >= 2) {
       gameState.matchOver = true;
-      showComboText(`🏆🏆🏆 ${gameState.roundWinner === 0 ? 'JOUEUR 1' : 'JOUEUR 2'} GAGNE LA PARTIE ! 🏆🏆🏆`);
-      sfx.victory();
       
-      // Afficher un bouton pour recommencer
+      // Déclencher la fin de partie après un court délai
       setTimeout(() => {
         if (onMatchEnd) onMatchEnd(gameState.roundWinner);
-      }, 3000);
+      }, 2000);
     } else {
       // Continuer avec une nouvelle manche
       showComboText(`Manche ${gameState.roundsWon[0] + gameState.roundsWon[1] + 1} !`);
