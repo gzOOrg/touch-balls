@@ -495,8 +495,8 @@ function checkRoundEnd() {
  * Dessine la table de jeu
  */
 function drawTable() {
-  // Fond sombre
-  ctx.fillStyle = '#0a2818';
+  // Fond vert léger pour laisser voir l'image derrière
+  ctx.fillStyle = 'rgba(10, 40, 24, 0.3)';
   ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   
   // Grille cyberpunk

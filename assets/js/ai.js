@@ -31,16 +31,19 @@ const AI_CONFIG = {
   },
   [AI_LEVEL.TERMINATOR]: {
     name: 'TERMINATOR',
-    angleStep: 2,       // Angles testés tous les 2° (ULTRA précis)
-    powerStep: 0.025,   // 40 niveaux de puissance (précision extrême)
-    randomness: 0,      // Aucun aléatoire
-    thinkingTime: 3000, // Réflexion approfondie
+    angleStep: 1,       // Angles testés tous les 1° (ULTRA-ULTRA précis)
+    powerStep: 0.01,    // 100 niveaux de puissance (précision maximale)
+    randomness: 0,      // Aucun aléatoire - Machine parfaite
+    thinkingTime: 4000, // Réflexion très approfondie
     accuracy: 1.0,      // Précision parfaite
-    maxSimSteps: 1000,  // Simulation très profonde
-    wallBounces: 5,     // Peut calculer jusqu'à 5 rebonds
+    maxSimSteps: 2000,  // Simulation extrêmement profonde
+    wallBounces: 8,     // Peut calculer jusqu'à 8 rebonds complexes
     comboThreshold: 700,// Score minimum pour un combo
-    oneShotBonus: 2000, // Bonus énorme pour les one-shots
-    perfectShotRange: 0.95 // Recherche de tirs parfaits
+    oneShotBonus: 3000, // Bonus ÉNORME pour les one-shots
+    perfectShotRange: 0.98, // Recherche de tirs quasi-parfaits
+    deepAnalysis: true, // Analyse profonde des séquences
+    adaptiveStrategy: true, // Stratégie adaptative
+    multiStepPlanning: 3 // Planification sur 3 coups d'avance
   }
 };
 
@@ -72,17 +75,20 @@ export class AI {
     
     // Message de réflexion selon le niveau
     if (this.level === AI_LEVEL.TERMINATOR) {
-      // Introduction dramatique pour TERMINATOR
-      showComboText(t('aiTerminatorMode'));
-      setTimeout(() => {
-        if (this.isThinking) showComboText(t('aiAnalyzing'));
-      }, 500);
-      setTimeout(() => {
-        if (this.isThinking) showComboText(t('aiCalculating'));
-      }, 1200);
-      setTimeout(() => {
-        if (this.isThinking) showComboText(t('aiOptimizing'));
-      }, 2000);
+      // Séquence dramatique améliorée pour TERMINATOR
+      showComboText('💀 TERMINATOR ACTIVÉ');
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      showComboText('🧠 ANALYSE QUANTUM...');
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      showComboText('⚡ CALCUL PROBABILITÉS...');
+      await new Promise(resolve => setTimeout(resolve, 700));
+      
+      showComboText('🎯 OPTIMISATION FATALE...');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      showComboText('🔥 EXÉCUTION IMMINENTE...');
     } else {
       showComboText(`${this.config.name} ${t('aiThinking')}`);
     }
@@ -90,37 +96,60 @@ export class AI {
     // Simuler le temps de réflexion
     await this.think();
     
-    // Calculer le meilleur coup
-    const bestShot = this.calculateBestShot();
+    // Calculer le meilleur coup avec analyse avancée
+    const bestShot = this.level === AI_LEVEL.TERMINATOR ? 
+      await this.calculateTerminatorShot() : 
+      this.calculateBestShot();
     
     if (bestShot) {
-      // Pour TERMINATOR, afficher des infos sur le coup calculé
-      if (this.level === AI_LEVEL.TERMINATOR && bestShot.score > 600) {
-        console.log('🤖 TERMINATOR - Coup optimal trouvé:', {
+      // Pour TERMINATOR, afficher des infos détaillées
+      if (this.level === AI_LEVEL.TERMINATOR) {
+        console.log('💀 TERMINATOR - ANALYSE COMPLÈTE:', {
           angle: Math.round(bestShot.angle * 180 / Math.PI) + '°',
           power: Math.round(bestShot.power * 100) + '%',
           score: Math.round(bestShot.score),
-          prediction: bestShot.score > 900 ? 'VICTOIRE PROBABLE' : 'COUP STRATÉGIQUE'
+          stratégie: bestShot.strategy || 'DESTRUCTION',
+          probabilité: bestShot.score > 3000 ? '99.9%' : 
+                      bestShot.score > 2000 ? '95%' : 
+                      bestShot.score > 1000 ? '80%' : '60%',
+          type: bestShot.type || 'TERMINATOR_SHOT'
         });
+        
+        // Messages spéciaux selon le score
+        if (bestShot.score > 4000) {
+          showComboText('🎯 TIR PARFAIT CALCULÉ');
+        } else if (bestShot.score > 3000) {
+          showComboText('⚡ ONE-SHOT GARANTI');  
+        } else if (bestShot.score > 2000) {
+          showComboText('🔥 COUP DÉVASTATEUR');
+        }
       }
       
-      // Ajouter de l'imprécision selon le niveau
+      // TERMINATOR n'a jamais d'imprécision
       const finalShot = this.addInaccuracy(bestShot);
       
-      // Afficher la visée de l'IA pendant un temps variable selon le niveau
+      // Afficher la visée avec effet dramatique pour TERMINATOR
       gameState.aiAiming = {
         ball: finalShot.ball,
         angle: finalShot.angle,
         power: finalShot.power
       };
       
-      // Temps d'affichage de la visée selon le niveau
-      const aimDisplayTime = this.level === AI_LEVEL.DUMB ? 1500 : 
+      // Temps d'affichage de la visée
+      const aimDisplayTime = this.level === AI_LEVEL.TERMINATOR ? 600 : 
                            this.level === AI_LEVEL.SMART ? 1200 : 
-                           800; // TERMINATOR vise plus vite
+                           1500;
       
-      // Attendre un peu pour montrer la visée
+      if (this.level === AI_LEVEL.TERMINATOR) {
+        showComboText('🎯 ACQUISITION CIBLE...');
+      }
+      
       await new Promise(resolve => setTimeout(resolve, aimDisplayTime));
+      
+      // Message final pour TERMINATOR
+      if (this.level === AI_LEVEL.TERMINATOR) {
+        showComboText('💥 ÉLIMINATION !');
+      }
       
       // Exécuter le tir
       this.executeShot(finalShot);
@@ -139,11 +168,61 @@ export class AI {
   }
   
   /**
-   * Calcule le meilleur coup possible
+   * Calcule le meilleur coup avec l'algorithme TERMINATOR ultra-avancé
+   */
+  async calculateTerminatorShot() {
+    console.log('💀 TERMINATOR: Lancement de l\'analyse quantique...');
+    
+    // Analyse de la situation actuelle
+    const gameAnalysis = this.analyzeGameSituation();
+    console.log('🧠 TERMINATOR: Situation détectée -', gameAnalysis.type, 'Urgence:', gameAnalysis.urgency);
+    
+    // Phase 1: Analyse immédiate des one-shots parfaits
+    // TERMINATOR ne joue qu'avec SES balles (owner === 1)
+    const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall && b.owner === 1);
+    if (!playableBalls.length) {
+      console.log('💀 TERMINATOR: Aucune balle disponible - Situation critique');
+      return null;
+    }
+    
+    // Phase Prioritaire: Adaptation stratégique selon la situation
+    const situationalShot = this.adaptStrategyToSituation(gameAnalysis, playableBalls);
+    if (situationalShot && situationalShot.score > 2000) {
+      console.log('🎯 TERMINATOR: Stratégie situationnelle appliquée avec succès');
+      return situationalShot;
+    }
+    
+    // Phase 2: Recherche exhaustive de one-shots avec précision extrême
+    const perfectOneShot = await this.findUltimatePerfectShot(playableBalls);
+    if (perfectOneShot && perfectOneShot.score > 4000) {
+      console.log('🎯 TERMINATOR: One-shot PARFAIT détecté avec certitude absolue');
+      return perfectOneShot;
+    }
+    
+    // Phase 3: Planification multi-étapes avec simulation profonde
+    const multiStepPlan = this.calculateMultiStepStrategy(playableBalls);
+    if (multiStepPlan && multiStepPlan.score > 3500) {
+      console.log('🧠 TERMINATOR: Stratégie multi-étapes optimale calculée');
+      return multiStepPlan;
+    }
+    
+    // Phase 4: Analyse des combos complexes avec rebonds multiples
+    const complexCombo = this.findComplexComboShot(playableBalls);
+    if (complexCombo && complexCombo.score > 3000) {
+      console.log('⚡ TERMINATOR: Combo complexe identifié');
+      return complexCombo;
+    }
+    
+    // Phase 5: Si rien d'extraordinaire, utiliser l'algorithme standard amélioré
+    return this.calculateBestShot();
+  }
+
+  /**
+   * Calcule le meilleur coup possible (algorithme standard)
    */
   calculateBestShot() {
-    // L'IA peut maintenant utiliser TOUTES les boules actives (sauf la rouge)
-    const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall);
+    // L'IA utilise SEULEMENT ses propres balles (owner === 1)
+    const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall && b.owner === 1);
     if (!playableBalls.length) return null;
     
     let bestShot = null;
@@ -169,14 +248,26 @@ export class AI {
           this.getPowerRange();
           
         for (const power of powerRange) {
-          const score = this.evaluateShot(ball, angle * Math.PI / 180, power);
+          // Vérifier rapidement si ce tir causerait un suicide
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const quickSim = this.simulateFullShot(ball, vx, vy);
+          const selfKill = quickSim.events.find(e => e.type === 'selfInHole');
+          
+          if (selfKill) {
+            continue; // Ignorer ce tir suicidaire
+          }
+          
+          const score = this.evaluateShot(ball, testAngle, power);
           shotsEvaluated++;
           
           if (score > bestScore) {
             bestScore = score;
             bestShot = {
               ball,
-              angle: angle * Math.PI / 180,
+              angle: testAngle,
               power,
               score
             };
@@ -656,7 +747,7 @@ export class AI {
             simulation.score += 400;
           } else if (simBall.owner === 1) {
             simulation.events.push({ type: 'selfInHole', step });
-            simulation.score -= 500; // Pénalité
+            simulation.score -= 10000; // PÉNALITÉ MASSIVE - Interdit !
           }
         }
       });
@@ -715,6 +806,594 @@ export class AI {
   }
   
   /**
+   * Recherche exhaustive de one-shots parfaits pour TERMINATOR
+   */
+  async findUltimatePerfectShot(playableBalls) {
+    const redBall = gameState.redBall;
+    if (!redBall || !redBall.isActive) return null;
+    
+    let bestShot = null;
+    let bestScore = 0;
+    let shotsAnalyzed = 0;
+    
+    console.log('🔍 TERMINATOR: Analyse exhaustive de', playableBalls.length, 'boules...');
+    
+    for (const ball of playableBalls) {
+      // Analyse ultra-précise avec 0.5° d'incrémentation
+      for (let angle = 0; angle < 360; angle += 0.5) {
+        // Puissances ultra-précises
+        for (let power = 0.1; power <= 1; power += 0.005) {
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          shotsAnalyzed++;
+          
+          // VÉRIFICATION ANTI-SUICIDE : Rejeter si mes balles tombent
+          const selfKill = simulation.events.find(e => e.type === 'selfInHole');
+          if (selfKill) {
+            if (shotsAnalyzed % 1000 === 0) {
+              console.log('🛡️ TERMINATOR: Suicide évité - recherche alternative...');
+            }
+            continue; // Passer au tir suivant
+          }
+          
+          // Recherche spécifique de one-shots ultra-rapides
+          const redInHoleEvent = simulation.events.find(e => e.type === 'redInHole');
+          if (redInHoleEvent) {
+            let score = simulation.score;
+            
+            // Bonus massifs pour rapidité d'exécution
+            if (redInHoleEvent.step < 30) {
+              score += 5000; // One-shot INSTANTANÉ
+            } else if (redInHoleEvent.step < 60) {
+              score += 4000; // One-shot ultra-rapide
+            } else if (redInHoleEvent.step < 100) {
+              score += 3000; // One-shot rapide
+            }
+            
+            // Bonus pour tirs directs sans rebonds excessifs
+            const bounceEvents = simulation.events.filter(e => e.type === 'wallBounce');
+            if (bounceEvents.length === 0) {
+              score += 2000; // Tir direct parfait
+            } else if (bounceEvents.length <= 2) {
+              score += 1000; // Tir avec rebonds contrôlés
+            }
+            
+            if (score > bestScore) {
+              bestScore = score;
+              bestShot = {
+                ball,
+                angle: testAngle,
+                power,
+                score,
+                strategy: 'ULTIMATE_ONESHOT',
+                type: 'perfect'
+              };
+            }
+          }
+        }
+      }
+    }
+    
+    console.log(`💀 TERMINATOR: ${shotsAnalyzed} tirs analysés, meilleur one-shot: ${Math.round(bestScore)}`);
+    return bestShot;
+  }
+  
+  /**
+   * Calcule une stratégie multi-étapes
+   */
+  calculateMultiStepStrategy(playableBalls) {
+    // Analyser les positions après notre coup pour préparer le coup suivant
+    let bestStrategy = null;
+    let bestScore = 0;
+    
+    for (const ball of playableBalls) {
+      for (let angle = 0; angle < 360; angle += 5) {
+        for (let power = 0.3; power <= 1; power += 0.1) {
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const firstStepSim = this.simulateFullShot(ball, vx, vy);
+          
+          // Simuler l'état après notre coup
+          const futureState = this.predictFutureGameState(firstStepSim);
+          
+          // Évaluer les possibilités de coup suivant
+          const nextShotPotential = this.evaluateNextShotPotential(futureState);
+          
+          const totalScore = firstStepSim.score + nextShotPotential;
+          
+          if (totalScore > bestScore) {
+            bestScore = totalScore;
+            bestStrategy = {
+              ball,
+              angle: testAngle,
+              power,
+              score: totalScore,
+              strategy: 'MULTI_STEP_DOMINATION',
+              type: 'strategic'
+            };
+          }
+        }
+      }
+    }
+    
+    return bestStrategy;
+  }
+  
+  /**
+   * Trouve des combos complexes avec rebonds multiples
+   */
+  findComplexComboShot(playableBalls) {
+    let bestCombo = null;
+    let bestScore = 0;
+    
+    for (const ball of playableBalls) {
+      // Chercher des angles qui permettent des rebonds créatifs
+      for (let angle = 0; angle < 360; angle += 3) {
+        for (let power = 0.5; power <= 1; power += 0.05) {
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          
+          // Chercher des combos spéciaux
+          let comboScore = simulation.score;
+          
+          // Bonus pour toucher plusieurs boules ennemies
+          const enemyHits = simulation.events.filter(e => e.type === 'hitEnemy').length;
+          if (enemyHits >= 2) {
+            comboScore += 1500 * enemyHits; // Super combo !
+          }
+          
+          // Bonus pour séquences complexes
+          const redHit = simulation.events.find(e => e.type === 'hitRed');
+          const redInHole = simulation.events.find(e => e.type === 'redInHole');
+          
+          if (redHit && redInHole && enemyHits > 0) {
+            comboScore += 2000; // Combo ultime
+          }
+          
+          if (comboScore > bestScore) {
+            bestScore = comboScore;
+            bestCombo = {
+              ball,
+              angle: testAngle,
+              power,
+              score: comboScore,
+              strategy: 'COMPLEX_COMBO_DEVASTATION',
+              type: 'combo'
+            };
+          }
+        }
+      }
+    }
+    
+    return bestCombo;
+  }
+  
+  /**
+   * Prédit l'état du jeu après un coup
+   */
+  predictFutureGameState(simulation) {
+    // Retourner les positions finales des boules après le coup simulé
+    return simulation.balls.filter(b => b.isActive);
+  }
+  
+  /**
+   * Évalue le potentiel du coup suivant
+   */
+  evaluateNextShotPotential(futureState) {
+    const redBall = futureState.find(b => b.isRed);
+    if (!redBall) return 0; // La rouge est déjà tombée
+    
+    const holeX = CANVAS_WIDTH / 2;
+    const holeY = CANVAS_HEIGHT / 2;
+    const redToHoleDist = distance(redBall.x, redBall.y, holeX, holeY);
+    
+    // Plus la rouge est proche du trou, meilleur c'est pour le coup suivant
+    let potential = Math.max(0, 500 - redToHoleDist);
+    
+    // Bonus si nos boules sont bien positionnées pour le coup suivant
+    const myBalls = futureState.filter(b => !b.isRed && b.owner === 1);
+    for (const ball of myBalls) {
+      const ballToRedDist = distance(ball.x, ball.y, redBall.x, redBall.y);
+      if (ballToRedDist < 200) {
+        potential += 200; // Nos boules sont proches de la rouge
+      }
+    }
+    
+    return potential;
+  }
+  
+  /**
+   * Analyse COMPLÈTE de la situation de jeu - TERMINATOR s'adapte à TOUT
+   */
+  analyzeGameSituation() {
+    const redBall = gameState.redBall;
+    const holeX = CANVAS_WIDTH / 2;
+    const holeY = CANVAS_HEIGHT / 2;
+    
+    // Mes balles (IA = owner 1)
+    const myBalls = gameState.balls.filter(b => b.isActive && b.owner === 1);
+    const enemyBalls = gameState.balls.filter(b => b.isActive && b.owner === 0);
+    
+    let analysis = {
+      type: 'STANDARD',
+      urgency: 'NORMALE',
+      strategy: 'BALANCED',
+      factors: []
+    };
+    
+    // Situation 1: CRITIQUE - Rouge très proche du trou
+    if (redBall && redBall.isActive) {
+      const redToHoleDist = distance(redBall.x, redBall.y, holeX, holeY);
+      
+      if (redToHoleDist < 50) {
+        analysis.type = 'ROUGE_CRITIQUE';
+        analysis.urgency = 'EXTRÊME';
+        analysis.strategy = 'ONE_SHOT_ONLY';
+        analysis.factors.push('Rouge à moins de 50px du trou');
+      } else if (redToHoleDist < 100) {
+        analysis.type = 'ROUGE_DANGEREUSE';
+        analysis.urgency = 'ÉLEVÉE';
+        analysis.strategy = 'PRIORITÉ_ONE_SHOT';
+        analysis.factors.push('Rouge proche du trou');
+      }
+    }
+    
+    // Situation 2: DÉSAVANTAGE - Moins de balles que l'adversaire
+    if (myBalls.length < enemyBalls.length) {
+      analysis.type = 'DÉSAVANTAGE_NUMÉRIQUE';
+      analysis.urgency = 'ÉLEVÉE';
+      analysis.strategy = 'AGGRESSIVE_PRECISION';
+      analysis.factors.push(`${myBalls.length} vs ${enemyBalls.length} balles`);
+    }
+    
+    // Situation 3: AVANTAGE - Plus de balles que l'adversaire
+    if (myBalls.length > enemyBalls.length) {
+      analysis.type = 'AVANTAGE_NUMÉRIQUE';
+      analysis.urgency = 'FAIBLE';
+      analysis.strategy = 'CONTROL_GAME';
+      analysis.factors.push('Supériorité numérique');
+    }
+    
+    // Situation 4: DERNIÈRE BALLE - Une seule balle restante
+    if (myBalls.length === 1) {
+      analysis.type = 'DERNIÈRE_CHANCE';
+      analysis.urgency = 'MAXIMALE';
+      analysis.strategy = 'PERFECTION_ABSOLUE';
+      analysis.factors.push('Dernière balle disponible');
+    }
+    
+    // Situation 5: MES BALLES EN DANGER - Proches du trou
+    const dangerousBalls = myBalls.filter(ball => {
+      const distToHole = distance(ball.x, ball.y, holeX, holeY);
+      return distToHole < 80;
+    });
+    
+    if (dangerousBalls.length > 0) {
+      analysis.type = 'MES_BALLES_EN_DANGER';
+      analysis.urgency = 'ÉLEVÉE';
+      analysis.strategy = 'SAUVETAGE_PRUDENT';
+      analysis.factors.push(`${dangerousBalls.length} balles en danger`);
+    }
+    
+    // Situation 6: BALLES ENNEMIES FAVORABLES - Bien positionnées pour nous aider
+    const helpfulEnemyBalls = enemyBalls.filter(enemy => {
+      if (!redBall) return false;
+      
+      // Vérifier si l'ennemi peut nous aider à toucher la rouge
+      const enemyToRed = distance(enemy.x, enemy.y, redBall.x, redBall.y);
+      const redToHole = distance(redBall.x, redBall.y, holeX, holeY);
+      
+      return enemyToRed < 150 && redToHole > 100;
+    });
+    
+    if (helpfulEnemyBalls.length > 0) {
+      analysis.factors.push('Balles ennemies exploitables');
+    }
+    
+    // Situation 7: GÉOMÉTRIE PARFAITE - Alignements favorables
+    if (redBall && redBall.isActive) {
+      let perfectAlignments = 0;
+      
+      myBalls.forEach(ball => {
+        const ballToRed = distance(ball.x, ball.y, redBall.x, redBall.y);
+        const redToHoleAngle = Math.atan2(holeY - redBall.y, holeX - redBall.x);
+        const ballToRedAngle = Math.atan2(redBall.y - ball.y, redBall.x - ball.x);
+        
+        let angleDiff = Math.abs(ballToRedAngle - redToHoleAngle);
+        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+        
+        if (ballToRed < 200 && angleDiff < Math.PI / 6) {
+          perfectAlignments++;
+        }
+      });
+      
+      if (perfectAlignments > 0) {
+        analysis.type = 'GÉOMÉTRIE_PARFAITE';
+        analysis.strategy = 'EXPLOIT_GEOMETRY';
+        analysis.factors.push(`${perfectAlignments} alignements parfaits`);
+      }
+    }
+    
+    // Situation 8: DÉBUT DE PARTIE - Toutes les balles présentes
+    if (myBalls.length === 2 && enemyBalls.length === 2) {
+      analysis.type = 'DÉBUT_PARTIE';
+      analysis.strategy = 'OPENING_ADVANTAGE';
+      analysis.factors.push('Début de partie - toutes options ouvertes');
+    }
+    
+    // Situation 9: FIN DE PARTIE - Peu de balles restantes
+    const totalBalls = myBalls.length + enemyBalls.length;
+    if (totalBalls <= 2) {
+      analysis.type = 'FIN_PARTIE';
+      analysis.urgency = 'MAXIMALE';
+      analysis.strategy = 'ENDGAME_PRECISION';
+      analysis.factors.push('Fin de partie critique');
+    }
+    
+    return analysis;
+  }
+  
+  /**
+   * Adapte la stratégie selon l'analyse de situation
+   */
+  adaptStrategyToSituation(analysis, playableBalls) {
+    console.log('🎯 TERMINATOR: Adaptation stratégique -', analysis.strategy);
+    
+    switch (analysis.strategy) {
+      case 'ONE_SHOT_ONLY':
+        // Mode panique - ne chercher QUE des one-shots
+        return this.findEmergencyOneShot(playableBalls);
+        
+      case 'AGGRESSIVE_PRECISION':
+        // Mode agressif - prendre des risques calculés
+        return this.findAggressivePrecisionShot(playableBalls);
+        
+      case 'CONTROL_GAME':
+        // Mode contrôle - placer les balles stratégiquement
+        return this.findControlShot(playableBalls);
+        
+      case 'PERFECTION_ABSOLUE':
+        // Mode perfection - dernière chance
+        return this.findPerfectionShot(playableBalls);
+        
+      case 'SAUVETAGE_PRUDENT':
+        // Mode défensif - sauver nos balles
+        return this.findDefensiveShot(playableBalls);
+        
+      case 'EXPLOIT_GEOMETRY':
+        // Mode géométrique - exploiter les alignements
+        return this.findGeometryShot(playableBalls);
+        
+      case 'OPENING_ADVANTAGE':
+        // Mode ouverture - prendre l'avantage initial
+        return this.findOpeningShot(playableBalls);
+        
+      case 'ENDGAME_PRECISION':
+        // Mode fin de partie - précision maximale
+        return this.findEndgameShot(playableBalls);
+        
+      default:
+        return null;
+    }
+  }
+  
+  /**
+   * Shot d'urgence - One-shot obligatoire
+   */
+  findEmergencyOneShot(playableBalls) {
+    console.log('🚨 TERMINATOR: MODE URGENCE - Recherche one-shot désespéré');
+    
+    // Analyse ultra-précise avec 0.1° d'incrémentation
+    for (const ball of playableBalls) {
+      for (let angle = 0; angle < 360; angle += 0.1) {
+        for (let power = 0.1; power <= 1; power += 0.002) {
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          
+          // VÉRIFICATION ANTI-SUICIDE : Rejeter si mes balles tombent
+          const selfKill = simulation.events.find(e => e.type === 'selfInHole');
+          if (selfKill) {
+            continue; // Passer au tir suivant
+          }
+          
+          const redInHole = simulation.events.find(e => e.type === 'redInHole');
+          
+          if (redInHole && redInHole.step < 200) {
+            return {
+              ball,
+              angle: testAngle,
+              power,
+              score: 10000, // Score maximum pour sauver la partie
+              strategy: 'EMERGENCY_ONESHOT',
+              type: 'emergency'
+            };
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Shot de précision agressive
+   */
+  findAggressivePrecisionShot(playableBalls) {
+    console.log('⚡ TERMINATOR: MODE AGRESSIF - Précision extrême');
+    
+    let bestShot = null;
+    let bestScore = 0;
+    
+    for (const ball of playableBalls) {
+      for (let angle = 0; angle < 360; angle += 0.5) {
+        for (let power = 0.7; power <= 1; power += 0.01) { // Puissance élevée
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          
+          // VÉRIFICATION ANTI-SUICIDE : Rejeter si mes balles tombent
+          const selfKill = simulation.events.find(e => e.type === 'selfInHole');
+          if (selfKill) {
+            continue; // Passer au tir suivant
+          }
+          
+          let score = simulation.score;
+          
+          // Bonus pour tirs agressifs
+          if (simulation.events.find(e => e.type === 'redInHole')) {
+            score += 3000;
+          }
+          if (simulation.events.filter(e => e.type === 'hitEnemy').length > 0) {
+            score += 1000; // Bonus pour perturber l'ennemi
+          }
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestShot = {
+              ball,
+              angle: testAngle,
+              power,
+              score,
+              strategy: 'AGGRESSIVE_PRECISION',
+              type: 'aggressive'
+            };
+          }
+        }
+      }
+    }
+    
+    return bestShot;
+  }
+  
+  /**
+   * Shot de contrôle défensif
+   */
+  findDefensiveShot(playableBalls) {
+    console.log('🛡️ TERMINATOR: MODE DÉFENSIF - Protection et contrôle');
+    
+    const holeX = CANVAS_WIDTH / 2;
+    const holeY = CANVAS_HEIGHT / 2;
+    let bestShot = null;
+    let bestScore = 0;
+    
+    for (const ball of playableBalls) {
+      for (let angle = 0; angle < 360; angle += 2) {
+        for (let power = 0.3; power <= 0.8; power += 0.05) { // Puissance modérée
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          
+          // VÉRIFICATION ANTI-SUICIDE : Rejeter si mes balles tombent
+          const selfKill = simulation.events.find(e => e.type === 'selfInHole');
+          if (selfKill) {
+            continue; // Passer au tir suivant
+          }
+          
+          let score = simulation.score;
+          
+          // Bonus pour éloigner nos balles du trou
+          const finalMyBalls = simulation.balls.filter(b => b.owner === 1 && b.isActive);
+          finalMyBalls.forEach(myBall => {
+            const distToHole = distance(myBall.x, myBall.y, holeX, holeY);
+            if (distToHole > 150) {
+              score += 500; // Bonus sécurité
+            }
+          });
+          
+          // Bonus pour éloigner la rouge si on ne peut pas la mettre
+          const finalRed = simulation.balls.find(b => b.isRed && b.isActive);
+          if (finalRed) {
+            const initialRedDist = distance(gameState.redBall.x, gameState.redBall.y, holeX, holeY);
+            const finalRedDist = distance(finalRed.x, finalRed.y, holeX, holeY);
+            
+            if (finalRedDist > initialRedDist + 50) {
+              score += 800; // Gros bonus défensif
+            }
+          }
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestShot = {
+              ball,
+              angle: testAngle,
+              power,
+              score,
+              strategy: 'DEFENSIVE_CONTROL',
+              type: 'defensive'
+            };
+          }
+        }
+      }
+    }
+    
+    return bestShot;
+  }
+  
+  /**
+   * Shot de perfection absolue (dernière chance)
+   */
+  findPerfectionShot(playableBalls) {
+    console.log('💎 TERMINATOR: MODE PERFECTION - Dernière chance');
+    
+    // Analyse avec précision MAXIMALE
+    for (const ball of playableBalls) {
+      for (let angle = 0; angle < 360; angle += 0.05) { // Ultra précis
+        for (let power = 0.05; power <= 1; power += 0.001) { // Toutes les puissances
+          const testAngle = angle * Math.PI / 180;
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simulation = this.simulateFullShot(ball, vx, vy);
+          
+          // VÉRIFICATION ANTI-SUICIDE : Rejeter si mes balles tombent
+          const selfKill = simulation.events.find(e => e.type === 'selfInHole');
+          if (selfKill) {
+            continue; // Passer au tir suivant
+          }
+          
+          const redInHole = simulation.events.find(e => e.type === 'redInHole');
+          
+          if (redInHole) {
+            return {
+              ball,
+              angle: testAngle,
+              power,
+              score: 15000, // Score ultime
+              strategy: 'ABSOLUTE_PERFECTION',
+              type: 'perfection'
+            };
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Shots pour les autres stratégies
+   */
+  findControlShot(playableBalls) { return this.findDefensiveShot(playableBalls); }
+  findGeometryShot(playableBalls) { return this.findAggressivePrecisionShot(playableBalls); }
+  findOpeningShot(playableBalls) { return this.findAggressivePrecisionShot(playableBalls); }
+  findEndgameShot(playableBalls) { return this.findPerfectionShot(playableBalls); }
+  
+  /**
    * Exécute le tir calculé
    */
   executeShot(shot) {
@@ -734,28 +1413,49 @@ export class AI {
     gameState.totalShots++;
     gameState.aiAiming = null; // Effacer la visée de l'IA
     
-    // Message selon le niveau et le score
-    if (ball.owner === 0 && this.level === AI_LEVEL.TERMINATOR) {
-      // TERMINATOR utilise une boule du joueur pour un coup parfait
-      showComboText('🤖 ' + t('aiTactical'));
-    } else if (ball.owner === 0) {
-      // L'IA utilise une boule du joueur
-      showComboText(t('aiUsingPlayerBall'));
-    } else if (this.level === AI_LEVEL.TERMINATOR) {
-      if (shot.score > 3000) {
-        showComboText(t('aiOneShot'));
-        // Effet sonore spécial pour les one-shots
-        setTimeout(() => sfx.epic(), 100);
-        setTimeout(() => sfx.victory(), 300);
-      } else if (shot.score > 2000 && shot.type === 'tactique') {
-        showComboText('🎯 POSITION TACTIQUE!');
-      } else if (shot.score > this.config.comboThreshold) {
-        showComboText(t('aiQuantum'));
-      } else if (shot.score > 500) {
-        showComboText(t('aiComplete'));
+    // Messages spécialisés selon la stratégie TERMINATOR
+    if (this.level === AI_LEVEL.TERMINATOR) {
+      // Messages selon la stratégie utilisée
+      switch (shot.strategy) {
+        case 'EMERGENCY_ONESHOT':
+          showComboText('🚨 SAUVETAGE CRITIQUE!');
+          setTimeout(() => sfx.epic(), 100);
+          break;
+        case 'ABSOLUTE_PERFECTION':
+          showComboText('💎 PERFECTION ABSOLUE!');
+          setTimeout(() => sfx.victory(), 100);
+          setTimeout(() => sfx.epic(), 300);
+          break;
+        case 'AGGRESSIVE_PRECISION':
+          showComboText('⚡ DESTRUCTION CALCULÉE!');
+          setTimeout(() => sfx.epic(), 100);
+          break;
+        case 'DEFENSIVE_CONTROL':
+          showComboText('🛡️ CONTRÔLE TOTAL!');
+          break;
+        case 'ULTIMATE_ONESHOT':
+          showComboText('🎯 ONE-SHOT ULTIME!');
+          setTimeout(() => sfx.epic(), 100);
+          setTimeout(() => sfx.victory(), 300);
+          break;
+        default:
+          if (shot.score > 5000) {
+            showComboText('💀 TERMINATION!');
+            setTimeout(() => sfx.epic(), 100);
+            setTimeout(() => sfx.victory(), 300);
+          } else if (shot.score > 3000) {
+            showComboText('🎯 ÉLIMINATION PRÉCISE!');
+            setTimeout(() => sfx.epic(), 100);
+          } else if (shot.score > 1000) {
+            showComboText('⚡ CALCUL PARFAIT!');
+          } else {
+            showComboText('🤖 EXÉCUTION TERMINÉE!');
+          }
       }
     } else if (this.level === AI_LEVEL.SMART && shot.score > 300) {
       showComboText(t('aiGoodShot'));
+    } else if (this.level === AI_LEVEL.DUMB) {
+      showComboText(t('aiThinking'));
     }
   }
   
