@@ -834,24 +834,33 @@ function setupLanguageButtons() {
   langButtons.forEach(button => {
     button.addEventListener('click', function() {
       const lang = this.getAttribute('data-lang');
+      console.log(`🌍 Bouton cliqué: ${lang}`);
       setLanguage(lang);
     });
   });
+  
+  console.log(`🔧 ${langButtons.length} boutons de langue configurés`);
 }
 
 /**
  * Définir la langue et traduire la page
  */
 function setLanguage(lang) {
+  console.log(`🌍 setLanguage appelé avec: ${lang}`);
+  
   // Sauvegarder la langue - use same key as game
   localStorage.setItem('billardLanguage', lang);
+  console.log(`💾 Langue sauvegardée: ${lang}`);
   
   // Mettre à jour les boutons actifs
   const langButtons = document.querySelectorAll('.hero-lang-btn');
+  console.log(`🔧 ${langButtons.length} boutons trouvés`);
+  
   langButtons.forEach(btn => {
     btn.classList.remove('active');
     if (btn.getAttribute('data-lang') === lang) {
       btn.classList.add('active');
+      console.log(`✅ Bouton ${lang} activé`);
     }
   });
   
@@ -863,19 +872,29 @@ function setLanguage(lang) {
  * Traduire la page
  */
 function translatePage(lang) {
+  console.log(`🔄 translatePage appelé avec: ${lang}`);
+  
   const translations = siteTranslations[lang] || siteTranslations.fr;
+  console.log(`📚 Traductions trouvées pour ${lang}:`, !!siteTranslations[lang]);
   
   // Traduire par data-translate
-  document.querySelectorAll('[data-translate]').forEach(element => {
+  const elementsToTranslate = document.querySelectorAll('[data-translate]');
+  console.log(`🏷️ ${elementsToTranslate.length} éléments avec data-translate trouvés`);
+  
+  let translatedCount = 0;
+  elementsToTranslate.forEach(element => {
     const key = element.getAttribute('data-translate');
     if (translations[key]) {
+      const oldText = element.textContent;
       element.textContent = translations[key];
+      translatedCount++;
+      console.log(`🔄 ${key}: "${oldText}" → "${translations[key]}"`);
+    } else {
+      console.warn(`⚠️ Clé manquante: ${key} pour la langue ${lang}`);
     }
   });
   
-  // Les éléments sont maintenant traduits via data-translate, pas besoin de sélecteurs CSS spécifiques
-  
-  console.log(`🌍 Page traduite en ${lang.toUpperCase()}`);
+  console.log(`✅ ${translatedCount} éléments traduits en ${lang.toUpperCase()}`);
   
   // Notify game that language has changed (if game is loaded in another tab/frame)
   try {
@@ -890,16 +909,7 @@ function translatePage(lang) {
 /**
  * Configuration des boutons de langue
  */
-function setupLanguageButtons() {
-  const langButtons = document.querySelectorAll('.nav-lang-btn');
-  
-  langButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const lang = this.getAttribute('data-lang');
-      setLanguage(lang);
-    });
-  });
-}
+
 
 
 
