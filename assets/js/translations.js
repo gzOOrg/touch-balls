@@ -62,7 +62,12 @@ export const translations = {
     roundWon: "GAGNE LA MANCHE !",
     matchWon: "GAGNE LA PARTIE !",
     player1Wins: "🏆 JOUEUR 1 GAGNE LA MANCHE !",
-    player2Wins: "🏆 JOUEUR 2 GAGNE LA MANCHE !"
+    player2Wins: "🏆 JOUEUR 2 GAGNE LA MANCHE !",
+    
+    // Textes d'aide
+    difficultyHelp: "NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore",
+    gameInstructions: "👆 Touche une boule, tire en arrière, relâche pour DÉTRUIRE !",
+    startGame: "COMMENCER LE MASSACRE"
   },
   
   nl: {
@@ -133,7 +138,12 @@ export const translations = {
     connectionReady: "Verbinding klaar!",
     disconnected: "heeft de verbinding verbroken",
     connectionLost: "VERBINDING VERLOREN!",
-    connectedTo: "Verbonden met:"
+    connectedTo: "Verbonden met:",
+    
+    // Helpteksten
+    difficultyHelp: "BEGINNER: Reuzengat • PRO: Evenwichtig • LEGENDE: Hardcore modus",
+    gameInstructions: "👆 Raak een bal aan, trek terug, laat los om te VERNIETIGEN!",
+    startGame: "BEGIN HET BLOEDBAD"
   }
 };
 

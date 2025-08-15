@@ -23,8 +23,8 @@
               <span class="flag">🇳🇱</span>
               <span class="lang-text">NL</span>
             </button>
-          </div>
-          <button id="restartBtn" class="btn secondary">NOUVELLE PARTIE</button>
+    </div>
+    <button id="restartBtn" class="btn secondary">NOUVELLE PARTIE</button>
         </div>
   </div>
 
@@ -112,15 +112,15 @@
           <input type="radio" name="difficulty" id="diff3" value="3">
           <label for="diff3">LEGEND</label>
         </div>
-        <div class="help">NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore</div>
+        <div class="help" id="difficultyHelp">NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore</div>
       </div>
     </div>
     
     <div class="row" style="margin-top:30px;align-items:center;justify-content:space-between">
-      <div class="help" style="color:var(--neon-cyan)">
+      <div class="help" id="gameInstructions" style="color:var(--neon-cyan)">
         👆 Touche une boule, tire en arrière, relâche pour DÉTRUIRE !
       </div>
-      <button id="startBtn" class="btn">🚀 COMMENCER LE MASSACRE</button>
+      <button id="startBtn" class="btn">🚀 <span id="startBtnText">COMMENCER LE MASSACRE</span></button>
     </div>
   </div>
 
@@ -208,7 +208,7 @@
           <span class="stat-icon">🎱</span>
           <span class="stat-label">Score final</span>
           <span class="stat-value" id="finalScore">2 - 0</span>
-        </div>
+    </div>
         <div class="victory-stat">
           <span class="stat-icon">🎯</span>
           <span class="stat-label">Tirs totaux</span>

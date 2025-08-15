@@ -447,7 +447,17 @@ function updateUITexts() {
   
   // Boutons de navigation
   if (ui.homeBtn) ui.homeBtn.textContent = t('home');
-  if (ui.startBtn) ui.startBtn.textContent = t('ready');
+  
+  // Bouton de démarrage et texte
+  const startBtnText = document.getElementById('startBtnText');
+  if (startBtnText) startBtnText.textContent = t('startGame');
+  
+  // Textes d'aide
+  const difficultyHelp = document.getElementById('difficultyHelp');
+  if (difficultyHelp) difficultyHelp.textContent = t('difficultyHelp');
+  
+  const gameInstructions = document.getElementById('gameInstructions');
+  if (gameInstructions) gameInstructions.innerHTML = t('gameInstructions');
   
   // Labels de mode de jeu
   const gameModeLabels = document.querySelectorAll('label');
@@ -704,7 +714,7 @@ function initializeEvents() {
   console.log('✅ Event listeners ajoutés aux boutons de mode');
   
   // Boutons de contrôle
-  ui.startBtn.addEventListener('click', startGame);
+  if (ui.startBtn) ui.startBtn.addEventListener('click', startGame);
   ui.restartBtn.addEventListener('click', goHome);
   ui.nextBtn.addEventListener('click', nextRound);
   ui.playAgain.addEventListener('click', goHome);
