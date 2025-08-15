@@ -252,10 +252,11 @@ function startGame() {
   setGameModeGetter(() => gameMode);
   
   // Configurer les callbacks réseau
-  setNetworkCallbacks(
-    (ballId, vx, vy) => network.sendShot(ballId, vx, vy),
-    (turn) => network.sendTurnChange(turn)
-  );
+  setNetworkCallbacks({
+    onShot: (ballId, vx, vy) => network.sendShot(ballId, vx, vy),
+    onTurnChange: (turn) => network.sendTurnChange(turn),
+    onMatchEnd: (winner) => handleMatchEnd(winner)
+  });
   
   // Configurer la difficulté
   setDifficulty(difficulty);
@@ -300,6 +301,39 @@ function gameLoop(currentTime) {
   
   // Continuer la boucle
   animationId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * Met à jour les scores affichés
+ */
+window.updateGameScores = function(roundsWon) {
+  players[0].wins = roundsWon[0];
+  players[1].wins = roundsWon[1];
+  updateScores(players);
+};
+
+/**
+ * Gère la fin d'une partie
+ */
+function handleMatchEnd(winner) {
+  console.log('🏆 Partie terminée ! Gagnant :', winner);
+  
+  // Afficher un écran de victoire
+  const winnerName = players[winner].name;
+  showAchievement(`🏆 ${winnerName} GAGNE LA PARTIE ! 🏆`);
+  
+  // Afficher un bouton pour rejouer
+  setTimeout(() => {
+    if (confirm(`${winnerName} a gagné ! Voulez-vous rejouer ?`)) {
+      startMatch();
+      lastDisplayedTurn = -1;
+      players[0].wins = 0;
+      players[1].wins = 0;
+      updateScores(players);
+    } else {
+      goHome();
+    }
+  }, 2000);
 }
 
 /**

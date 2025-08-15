@@ -21,6 +21,8 @@ export const gameState = {
   isShot: false,
   roundOver: false,
   matchOver: false,
+  roundWinner: null,
+  roundsWon: [0, 0], // Nombre de manches gagnées par chaque joueur
   dragging: false,
   draggedBall: null,
   drag: { x: 0, y: 0 },  // Vecteur de drag actuel
@@ -41,6 +43,7 @@ let getGameMode = null;
 // Callback pour les événements réseau
 let onShot = null;
 let onTurnChange = null;
+let onMatchEnd = null;
 
 /**
  * Définit la fonction pour obtenir le mode de jeu
@@ -52,9 +55,10 @@ export function setGameModeGetter(getter) {
 /**
  * Définit les callbacks réseau
  */
-export function setNetworkCallbacks(shotCallback, turnCallback) {
-  onShot = shotCallback;
-  onTurnChange = turnCallback;
+export function setNetworkCallbacks(callbacks) {
+  onShot = callbacks.onShot || null;
+  onTurnChange = callbacks.onTurnChange || null;
+  onMatchEnd = callbacks.onMatchEnd || null;
 }
 
 /**
@@ -386,12 +390,23 @@ function checkRoundEnd() {
   
   // Vérifier les conditions de victoire
   if (!gameState.redBall.isActive) {
-    // Quelqu'un a fait tomber la rouge
+    // La boule rouge est tombée - le joueur actuel gagne la manche !
     gameState.roundOver = true;
-    // TODO: Gérer la victoire/défaite selon qui a tiré
-  } else if (player1Balls === 0 || player2Balls === 0) {
-    // Un joueur n'a plus de boules
+    gameState.roundWinner = gameState.currentTurn;
+    showComboText(`🏆 ${gameState.currentTurn === 0 ? 'JOUEUR 1' : 'JOUEUR 2'} GAGNE LA MANCHE !`);
+    sfx.victory();
+  } else if (player1Balls === 0) {
+    // Le joueur 1 n'a plus de boules - le joueur 2 gagne
     gameState.roundOver = true;
+    gameState.roundWinner = 1;
+    showComboText('🏆 JOUEUR 2 GAGNE LA MANCHE !');
+    sfx.victory();
+  } else if (player2Balls === 0) {
+    // Le joueur 2 n'a plus de boules - le joueur 1 gagne
+    gameState.roundOver = true;
+    gameState.roundWinner = 0;
+    showComboText('🏆 JOUEUR 1 GAGNE LA MANCHE !');
+    sfx.victory();
   }
   
   if (!gameState.roundOver) {
@@ -404,6 +419,9 @@ function checkRoundEnd() {
     if (onTurnChange && getGameMode && (getGameMode() === GAME_MODE.HOST || getGameMode() === GAME_MODE.GUEST)) {
       onTurnChange(gameState.currentTurn);
     }
+  } else {
+    // La manche est terminée, gérer la fin
+    handleRoundEnd();
   }
 }
 
@@ -683,7 +701,8 @@ function handlePointerDown(x, y) {
   
   // Vérifier si on clique sur une boule du joueur actuel
   gameState.balls.forEach(ball => {
-    if (!ball.isActive || ball.owner !== gameState.currentTurn) return;
+    // Ne pas permettre de déplacer la boule rouge ou les boules inactives
+    if (!ball.isActive || ball === gameState.redBall || ball.owner !== gameState.currentTurn) return;
     
     const dist = distance(x, y, ball.x, ball.y);
     if (dist < ball.radius + 10) {
@@ -745,7 +764,8 @@ function handlePointerMove(x, y) {
     // Vérifier si on survole une boule jouable
     let hoveringBall = false;
     gameState.balls.forEach(ball => {
-      if (!ball.isActive || ball.owner !== gameState.currentTurn) return;
+      // Ne pas permettre de survoler la boule rouge ou les boules inactives
+      if (!ball.isActive || ball === gameState.redBall || ball.owner !== gameState.currentTurn) return;
       
       const d = distance(x, y, ball.x, ball.y);
       if (d < ball.radius + 10) {
@@ -824,7 +844,57 @@ export function startMatch() {
   gameState.gameStartTime = Date.now();
   gameState.totalShots = 0;
   gameState.currentStreak = 0;
+  gameState.roundsWon = [0, 0];
+  gameState.matchOver = false;
+  gameState.roundOver = false;
+  gameState.roundWinner = null;
   resetBalls();
+}
+
+/**
+ * Démarre une nouvelle manche
+ */
+export function startNewRound() {
+  gameState.roundOver = false;
+  gameState.roundWinner = null;
+  gameState.isShot = false;
+  gameState.fallenBalls = [];
+  gameState.currentTurn = 0; // Les blancs commencent toujours
+  resetBalls();
+  updateTurnIndicator({name: 'JOUEUR 1', color: 'white'}, false);
+}
+
+/**
+ * Gère la fin d'une manche
+ */
+export function handleRoundEnd() {
+  if (gameState.roundWinner !== null) {
+    // Incrémenter le score du gagnant
+    gameState.roundsWon[gameState.roundWinner]++;
+    
+    // Mettre à jour l'affichage des scores
+    if (window.updateGameScores) {
+      window.updateGameScores(gameState.roundsWon);
+    }
+    
+    // Vérifier si la partie est terminée (2 manches gagnantes)
+    if (gameState.roundsWon[gameState.roundWinner] >= 2) {
+      gameState.matchOver = true;
+      showComboText(`🏆🏆🏆 ${gameState.roundWinner === 0 ? 'JOUEUR 1' : 'JOUEUR 2'} GAGNE LA PARTIE ! 🏆🏆🏆`);
+      sfx.victory();
+      
+      // Afficher un bouton pour recommencer
+      setTimeout(() => {
+        if (onMatchEnd) onMatchEnd(gameState.roundWinner);
+      }, 3000);
+    } else {
+      // Continuer avec une nouvelle manche
+      showComboText(`Manche ${gameState.roundsWon[0] + gameState.roundsWon[1] + 1} !`);
+      setTimeout(() => {
+        startNewRound();
+      }, 3000);
+    }
+  }
 }
 
 /**
