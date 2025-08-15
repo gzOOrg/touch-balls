@@ -33,7 +33,7 @@
     <!-- Mode de jeu -->
     <div class="row">
       <div class="col">
-        <label>🎮 MODE DE JEU</label>
+        <label id="gameModeLabel">🎮 MODE DE JEU</label>
         <div style="display:flex;gap:15px;margin:15px 0;flex-wrap:wrap">
           <button id="localBtn" class="btn">LOCAL</button>
           <button id="aiBtn" class="btn">vs IA</button>
@@ -45,7 +45,7 @@
 
     <!-- Section IA -->
     <div id="aiSection" class="multiplayer-section" style="display:none">
-      <label>🤖 NIVEAU DE L'IA</label>
+      <label id="aiLevelLabel">🤖 NIVEAU DE L'IA</label>
       <div class="stars" style="margin:15px 0">
         <input type="radio" name="aiLevel" id="ai1" value="1" checked>
         <label for="ai1">DUMB</label>
@@ -103,7 +103,7 @@
     
     <div class="row" style="margin-top:25px">
       <div class="col">
-        <label>🔥 NIVEAU DE DIFFICULTÉ</label>
+        <label id="difficultyLabel">🎯 DIFFICULTÉ</label>
         <div class="stars">
           <input type="radio" name="difficulty" id="diff1" value="1">
           <label for="diff1">NOOB</label>

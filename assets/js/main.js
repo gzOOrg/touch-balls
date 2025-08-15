@@ -475,17 +475,14 @@ function updateUITexts() {
   if (p2Label) p2Label.textContent = t('player2Label');
   
   // Labels de mode de jeu
-  const gameModeLabels = document.querySelectorAll('label');
-  gameModeLabels.forEach(label => {
-    const text = label.textContent;
-    if (text.includes('MODE DE JEU')) {
-      label.childNodes[0].textContent = '🎮 ' + t('gameMode');
-    } else if (text.includes('DIFFICULTÉ')) {
-      label.childNodes[0].textContent = '🎯 ' + t('difficulty');
-    } else if (text.includes('NIVEAU DE L\'IA')) {
-      label.childNodes[0].textContent = '🤖 ' + t('aiLevel');
-    }
-  });
+  const gameModeLabel = document.getElementById('gameModeLabel');
+  if (gameModeLabel) gameModeLabel.textContent = '🎮 ' + t('gameMode');
+  
+  const difficultyLabel = document.getElementById('difficultyLabel');
+  if (difficultyLabel) difficultyLabel.textContent = '🎯 ' + t('difficulty');
+  
+  const aiLevelLabel = document.getElementById('aiLevelLabel');
+  if (aiLevelLabel) aiLevelLabel.textContent = '🤖 ' + t('aiLevel');
   
   // Niveaux de difficulté
   const diff1Label = document.querySelector('label[for="diff1"]');
