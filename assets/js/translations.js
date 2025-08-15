@@ -70,7 +70,17 @@ export const translations = {
     difficultyHelp: "NOOB: Trou géant • PRO: Équilibré • LEGEND: Mode hardcore",
     gameInstructions: "👆 Touche une boule, tire en arrière, relâche pour DÉTRUIRE !",
     startGame: "COMMENCER LE MASSACRE",
-    aimAssist: "Assistance de visée"
+    aimAssist: "Assistance de visée",
+    
+    // Messages IA
+    aiThinking: "RÉFLÉCHIT...",
+    aiAnalyzing: "🤖 ANALYSE EN COURS...",
+    aiCalculating: "📊 CALCUL DES TRAJECTOIRES...",
+    aiOptimizing: "🎯 OPTIMISATION...",
+    aiQuantum: "🤖 CALCUL QUANTIQUE!",
+    aiComplete: "ANALYSE TERMINÉE!",
+    aiGoodShot: "BON TIR!",
+    aiPerfectCalc: "CALCUL PARFAIT!"
   },
   
   nl: {
@@ -149,7 +159,17 @@ export const translations = {
     difficultyHelp: "BEGINNER: Reuzengat • PRO: Evenwichtig • LEGENDE: Hardcore modus",
     gameInstructions: "👆 Raak een bal aan, trek terug, laat los om te VERNIETIGEN!",
     startGame: "BEGIN HET BLOEDBAD",
-    aimAssist: "Richthulp"
+    aimAssist: "Richthulp",
+    
+    // AI berichten
+    aiThinking: "DENKT NA...",
+    aiAnalyzing: "🤖 ANALYSE BEZIG...",
+    aiCalculating: "📊 TRAJECTEN BEREKENEN...",
+    aiOptimizing: "🎯 OPTIMALISEREN...",
+    aiQuantum: "🤖 QUANTUM BEREKENING!",
+    aiComplete: "ANALYSE VOLTOOID!",
+    aiGoodShot: "GOED SCHOT!",
+    aiPerfectCalc: "PERFECTE BEREKENING!"
   }
 };
 

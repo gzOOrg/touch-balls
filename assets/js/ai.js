@@ -6,6 +6,7 @@ import { AI_LEVEL, CANVAS_WIDTH, CANVAS_HEIGHT, POWER_MULTIPLIER, BALL_RADIUS } 
 import { length, normalize, distance, dotProduct } from './utils.js';
 import { gameState } from './game.js';
 import { showComboText } from './ui.js';
+import { t } from './translations.js';
 
 /**
  * Configuration par niveau d'IA
@@ -29,11 +30,14 @@ const AI_CONFIG = {
   },
   [AI_LEVEL.TERMINATOR]: {
     name: 'TERMINATOR',
-    angleStep: 10,      // Angles testés tous les 10°
-    powerStep: 0.1,     // 10 niveaux de puissance
+    angleStep: 5,       // Angles testés tous les 5° (très précis)
+    powerStep: 0.05,    // 20 niveaux de puissance (ultra précis)
     randomness: 0,      // Aucun aléatoire
-    thinkingTime: 3000, // Réflexion longue
-    accuracy: 1.0       // Précision parfaite
+    thinkingTime: 2500, // Réflexion optimisée
+    accuracy: 1.0,      // Précision parfaite
+    maxSimSteps: 500,   // Simulation profonde
+    wallBounces: 3,     // Peut calculer jusqu'à 3 rebonds
+    comboThreshold: 700 // Score minimum pour un combo
   }
 };
 
@@ -63,8 +67,18 @@ export class AI {
     
     this.isThinking = true;
     
-    // Afficher que l'IA réfléchit
-    showComboText(`${this.config.name} RÉFLÉCHIT...`);
+    // Message de réflexion selon le niveau
+    if (this.level === AI_LEVEL.TERMINATOR) {
+      showComboText(t('aiAnalyzing'));
+      setTimeout(() => {
+        if (this.isThinking) showComboText(t('aiCalculating'));
+      }, 800);
+      setTimeout(() => {
+        if (this.isThinking) showComboText(t('aiOptimizing'));
+      }, 1600);
+    } else {
+      showComboText(`${this.config.name} ${t('aiThinking')}`);
+    }
     
     // Simuler le temps de réflexion
     await this.think();
@@ -73,6 +87,16 @@ export class AI {
     const bestShot = this.calculateBestShot();
     
     if (bestShot) {
+      // Pour TERMINATOR, afficher des infos sur le coup calculé
+      if (this.level === AI_LEVEL.TERMINATOR && bestShot.score > 600) {
+        console.log('🤖 TERMINATOR - Coup optimal trouvé:', {
+          angle: Math.round(bestShot.angle * 180 / Math.PI) + '°',
+          power: Math.round(bestShot.power * 100) + '%',
+          score: Math.round(bestShot.score),
+          prediction: bestShot.score > 900 ? 'VICTOIRE PROBABLE' : 'COUP STRATÉGIQUE'
+        });
+      }
+      
       // Ajouter de l'imprécision selon le niveau
       const finalShot = this.addInaccuracy(bestShot);
       
@@ -136,6 +160,12 @@ export class AI {
     const vx = Math.cos(angle) * power * POWER_MULTIPLIER * 100;
     const vy = Math.sin(angle) * power * POWER_MULTIPLIER * 100;
     const shotDirection = normalize(vx, vy);
+    
+    // Pour TERMINATOR, utiliser la simulation avancée
+    if (this.level === AI_LEVEL.TERMINATOR) {
+      const simResult = this.simulateFullShot(ball, vx, vy);
+      return simResult.score;
+    }
     
     // 1. Évaluer le tir sur la boule rouge (priorité maximale)
     const redBall = gameState.redBall;
@@ -261,6 +291,195 @@ export class AI {
   }
   
   /**
+   * Simule un tir complet pour TERMINATOR (avec collisions et rebonds)
+   */
+  simulateFullShot(ball, vx, vy) {
+    const simulation = {
+      balls: gameState.balls.map(b => ({
+        x: b.x,
+        y: b.y,
+        vx: b === ball ? vx : 0,
+        vy: b === ball ? vy : 0,
+        radius: b.radius,
+        owner: b.owner,
+        isActive: b.isActive,
+        isRed: b === gameState.redBall,
+        original: b
+      })),
+      score: 0,
+      events: []
+    };
+    
+    const holeX = CANVAS_WIDTH / 2;
+    const holeY = CANVAS_HEIGHT / 2;
+    const holeRadius = gameState.holeSize;
+    const friction = 0.985;
+    const wallRestitution = 0.88;
+    const ballRestitution = 0.9;
+    
+    // Simuler la physique
+    for (let step = 0; step < this.config.maxSimSteps; step++) {
+      let hasMovement = false;
+      
+      // Mettre à jour les positions
+      simulation.balls.forEach(simBall => {
+        if (!simBall.isActive) return;
+        
+        // Appliquer la vitesse
+        simBall.x += simBall.vx * 0.016;
+        simBall.y += simBall.vy * 0.016;
+        
+        // Appliquer la friction
+        simBall.vx *= friction;
+        simBall.vy *= friction;
+        
+        // Vérifier le mouvement
+        if (Math.abs(simBall.vx) > 0.5 || Math.abs(simBall.vy) > 0.5) {
+          hasMovement = true;
+        }
+        
+        // Collisions avec les murs
+        if (simBall.x - simBall.radius < 0) {
+          simBall.x = simBall.radius;
+          simBall.vx = Math.abs(simBall.vx) * wallRestitution;
+        }
+        if (simBall.x + simBall.radius > CANVAS_WIDTH) {
+          simBall.x = CANVAS_WIDTH - simBall.radius;
+          simBall.vx = -Math.abs(simBall.vx) * wallRestitution;
+        }
+        if (simBall.y - simBall.radius < 0) {
+          simBall.y = simBall.radius;
+          simBall.vy = Math.abs(simBall.vy) * wallRestitution;
+        }
+        if (simBall.y + simBall.radius > CANVAS_HEIGHT) {
+          simBall.y = CANVAS_HEIGHT - simBall.radius;
+          simBall.vy = -Math.abs(simBall.vy) * wallRestitution;
+        }
+      });
+      
+      // Collisions entre boules
+      for (let i = 0; i < simulation.balls.length; i++) {
+        for (let j = i + 1; j < simulation.balls.length; j++) {
+          const b1 = simulation.balls[i];
+          const b2 = simulation.balls[j];
+          
+          if (!b1.isActive || !b2.isActive) continue;
+          
+          const dx = b2.x - b1.x;
+          const dy = b2.y - b1.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minDist = b1.radius + b2.radius;
+          
+          if (dist < minDist) {
+            // Collision détectée
+            const nx = dx / dist;
+            const ny = dy / dist;
+            
+            // Séparer les boules
+            const overlap = minDist - dist;
+            b1.x -= nx * overlap * 0.5;
+            b1.y -= ny * overlap * 0.5;
+            b2.x += nx * overlap * 0.5;
+            b2.y += ny * overlap * 0.5;
+            
+            // Calculer les nouvelles vitesses
+            const v1n = b1.vx * nx + b1.vy * ny;
+            const v2n = b2.vx * nx + b2.vy * ny;
+            
+            const v1t = -b1.vx * ny + b1.vy * nx;
+            const v2t = -b2.vx * ny + b2.vy * nx;
+            
+            // Échange des vitesses normales
+            b1.vx = (v2n * nx - v1t * ny) * ballRestitution;
+            b1.vy = (v2n * ny + v1t * nx) * ballRestitution;
+            b2.vx = (v1n * nx - v2t * ny) * ballRestitution;
+            b2.vy = (v1n * ny + v2t * nx) * ballRestitution;
+            
+            // Enregistrer l'événement
+            if (b1.original === ball && b2.isRed) {
+              simulation.events.push({ type: 'hitRed', step });
+            } else if (b1.original === ball && b2.owner === 0) {
+              simulation.events.push({ type: 'hitEnemy', step });
+            }
+          }
+        }
+      }
+      
+      // Vérifier les boules dans le trou
+      simulation.balls.forEach((simBall, idx) => {
+        if (!simBall.isActive) return;
+        
+        const holeDist = distance(simBall.x, simBall.y, holeX, holeY);
+        if (holeDist < holeRadius) {
+          simBall.isActive = false;
+          
+          if (simBall.isRed) {
+            simulation.events.push({ type: 'redInHole', step });
+            simulation.score += 1000; // Victoire !
+          } else if (simBall.owner === 0) {
+            simulation.events.push({ type: 'enemyInHole', step });
+            simulation.score += 400;
+          } else if (simBall.owner === 1) {
+            simulation.events.push({ type: 'selfInHole', step });
+            simulation.score -= 500; // Pénalité
+          }
+        }
+      });
+      
+      if (!hasMovement) break;
+    }
+    
+    // Calculer le score final basé sur les événements
+    let comboMultiplier = 1;
+    let hitRedEarly = false;
+    
+    simulation.events.forEach(event => {
+      if (event.type === 'hitRed' && event.step < 50) {
+        hitRedEarly = true;
+        simulation.score += 200;
+      }
+      if (event.type === 'hitEnemy') {
+        simulation.score += 150 * comboMultiplier;
+        comboMultiplier += 0.2;
+      }
+      if (event.type === 'redInHole' && hitRedEarly) {
+        simulation.score += 500; // Bonus combo
+      }
+    });
+    
+    // Bonus pour les positions finales stratégiques
+    const finalRedBall = simulation.balls.find(b => b.isRed && b.isActive);
+    if (finalRedBall) {
+      const finalHoleDist = distance(finalRedBall.x, finalRedBall.y, holeX, holeY);
+      if (finalHoleDist < 100) {
+        simulation.score += 300; // Boule rouge proche du trou
+      }
+    }
+    
+    // Stratégie défensive : éloigner la rouge du trou si on ne peut pas gagner
+    if (simulation.score < 500 && finalRedBall) {
+      // Calculer si la rouge s'est éloignée du trou
+      const initialRedDist = distance(gameState.redBall.x, gameState.redBall.y, holeX, holeY);
+      const finalRedDist = distance(finalRedBall.x, finalRedBall.y, holeX, holeY);
+      
+      if (finalRedDist > initialRedDist + 50) {
+        simulation.score += 250; // Bonus défensif
+      }
+    }
+    
+    // Pénalité si on laisse nos boules trop proches du trou
+    const myFinalBalls = simulation.balls.filter(b => b.owner === 1 && b.isActive);
+    myFinalBalls.forEach(myBall => {
+      const dist = distance(myBall.x, myBall.y, holeX, holeY);
+      if (dist < 80) {
+        simulation.score -= 100; // Danger !
+      }
+    });
+    
+    return simulation;
+  }
+  
+  /**
    * Exécute le tir calculé
    */
   executeShot(shot) {
@@ -279,11 +498,15 @@ export class AI {
     gameState.fallenBalls = [];
     gameState.totalShots++;
     
-    // Message selon le niveau
-    if (this.level === AI_LEVEL.TERMINATOR && shot.score > 500) {
-      showComboText('CALCUL PARFAIT!');
+    // Message selon le niveau et le score
+    if (this.level === AI_LEVEL.TERMINATOR) {
+      if (shot.score > this.config.comboThreshold) {
+        showComboText(t('aiQuantum'));
+      } else if (shot.score > 500) {
+        showComboText(t('aiComplete'));
+      }
     } else if (this.level === AI_LEVEL.SMART && shot.score > 300) {
-      showComboText('BON TIR!');
+      showComboText(t('aiGoodShot'));
     }
   }
   
