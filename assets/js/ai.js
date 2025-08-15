@@ -100,6 +100,21 @@ export class AI {
       // Ajouter de l'imprécision selon le niveau
       const finalShot = this.addInaccuracy(bestShot);
       
+      // Afficher la visée de l'IA pendant un temps variable selon le niveau
+      gameState.aiAiming = {
+        ball: finalShot.ball,
+        angle: finalShot.angle,
+        power: finalShot.power
+      };
+      
+      // Temps d'affichage de la visée selon le niveau
+      const aimDisplayTime = this.level === AI_LEVEL.DUMB ? 1500 : 
+                           this.level === AI_LEVEL.SMART ? 1200 : 
+                           800; // TERMINATOR vise plus vite
+      
+      // Attendre un peu pour montrer la visée
+      await new Promise(resolve => setTimeout(resolve, aimDisplayTime));
+      
       // Exécuter le tir
       this.executeShot(finalShot);
     }
@@ -120,14 +135,15 @@ export class AI {
    * Calcule le meilleur coup possible
    */
   calculateBestShot() {
-    const myBalls = gameState.balls.filter(b => b.isActive && b.owner === 1);
-    if (!myBalls.length) return null;
+    // L'IA peut maintenant utiliser TOUTES les boules actives (sauf la rouge)
+    const playableBalls = gameState.balls.filter(b => b.isActive && b !== gameState.redBall);
+    if (!playableBalls.length) return null;
     
     let bestShot = null;
     let bestScore = -Infinity;
     
-    // Tester toutes les boules
-    for (const ball of myBalls) {
+    // Tester toutes les boules disponibles
+    for (const ball of playableBalls) {
       // Tester différents angles
       for (let angle = 0; angle < 360; angle += this.config.angleStep) {
         // Tester différentes puissances
@@ -161,10 +177,15 @@ export class AI {
     const vy = Math.sin(angle) * power * POWER_MULTIPLIER * 100;
     const shotDirection = normalize(vx, vy);
     
+    // Bonus si on utilise une boule adverse (tactique)
+    if (ball.owner === 0) {
+      score += 50; // Bonus tactique pour utiliser les boules du joueur
+    }
+    
     // Pour TERMINATOR, utiliser la simulation avancée
     if (this.level === AI_LEVEL.TERMINATOR) {
       const simResult = this.simulateFullShot(ball, vx, vy);
-      return simResult.score;
+      return simResult.score + (ball.owner === 0 ? 100 : 0); // Bonus supplémentaire pour TERMINATOR
     }
     
     // 1. Évaluer le tir sur la boule rouge (priorité maximale)
@@ -497,9 +518,13 @@ export class AI {
     gameState.isShot = true;
     gameState.fallenBalls = [];
     gameState.totalShots++;
+    gameState.aiAiming = null; // Effacer la visée de l'IA
     
     // Message selon le niveau et le score
-    if (this.level === AI_LEVEL.TERMINATOR) {
+    if (ball.owner === 0) {
+      // L'IA utilise une boule du joueur
+      showComboText(t('aiUsingPlayerBall'));
+    } else if (this.level === AI_LEVEL.TERMINATOR) {
       if (shot.score > this.config.comboThreshold) {
         showComboText(t('aiQuantum'));
       } else if (shot.score > 500) {

@@ -80,7 +80,9 @@ export const translations = {
     aiQuantum: "🤖 CALCUL QUANTIQUE!",
     aiComplete: "ANALYSE TERMINÉE!",
     aiGoodShot: "BON TIR!",
-    aiPerfectCalc: "CALCUL PARFAIT!"
+    aiPerfectCalc: "CALCUL PARFAIT!",
+    aiTactical: "TIR TACTIQUE!",
+    aiUsingPlayerBall: "UTILISE TA BOULE!"
   },
   
   nl: {
@@ -169,7 +171,9 @@ export const translations = {
     aiQuantum: "🤖 QUANTUM BEREKENING!",
     aiComplete: "ANALYSE VOLTOOID!",
     aiGoodShot: "GOED SCHOT!",
-    aiPerfectCalc: "PERFECTE BEREKENING!"
+    aiPerfectCalc: "PERFECTE BEREKENING!",
+    aiTactical: "TACTISCH SCHOT!",
+    aiUsingPlayerBall: "GEBRUIKT JOUW BAL!"
   }
 };
 

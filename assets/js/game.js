@@ -34,7 +34,9 @@ export const gameState = {
   totalShots: 0,
   // Debug
   debugClick: null,
-  showDebug: false
+  showDebug: false,
+  // IA
+  aiAiming: null
 };
 
 // Canvas et contexte
@@ -475,6 +477,7 @@ function checkRoundEnd() {
     // Changer de tour
     gameState.currentTurn = 1 - gameState.currentTurn;
     gameState.totalShots++;
+    gameState.aiAiming = null; // Effacer la visée de l'IA
     updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
     
     // Envoyer le changement de tour en réseau si nécessaire
@@ -483,6 +486,7 @@ function checkRoundEnd() {
     }
   } else {
     // La manche est terminée, gérer la fin
+    gameState.aiAiming = null; // Effacer la visée de l'IA
     handleRoundEnd();
   }
 }
@@ -780,6 +784,48 @@ export function render() {
   
   // Dessiner toutes les boules
   gameState.balls.forEach(ball => ball.draw());
+  
+  // Dessiner la ligne de visée de l'IA si elle vise
+  if (gameState.aiAiming) {
+    const { ball, angle, power } = gameState.aiAiming;
+    
+    // Créer un vecteur de drag simulé pour l'affichage
+    const dragDistance = power * MAX_PULL_DISTANCE;
+    const dragVector = {
+      x: -Math.cos(angle) * dragDistance,
+      y: -Math.sin(angle) * dragDistance
+    };
+    
+    // Dessiner un cercle pulsant autour de la boule ciblée par l'IA
+    ctx.save();
+    const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+    const glowRadius = ball.radius * 1.5 * pulse;
+    
+    ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = '#ff00ff';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, glowRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    
+    // Dessiner la ligne de drag (en violet pour l'IA)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 0, 255, 0.8)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 5]);
+    ctx.shadowColor = '#ff00ff';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(ball.x, ball.y);
+    ctx.lineTo(ball.x + dragVector.x, ball.y + dragVector.y);
+    ctx.stroke();
+    ctx.restore();
+    
+    // Dessiner la ligne de visée
+    drawAimLine(ball, dragVector);
+  }
   
   // Dessiner la ligne de visée si on fait glisser
   if (gameState.dragging && gameState.draggedBall) {
