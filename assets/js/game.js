@@ -23,7 +23,7 @@ export const gameState = {
   matchOver: false,
   dragging: false,
   draggedBall: null,
-  dragStart: { x: 0, y: 0 },
+  drag: { x: 0, y: 0 },  // Vecteur de drag actuel
   fallenBalls: [],
   holeSize: HOLE_SIZES[2], // Pro par défaut
   gameStartTime: 0,
@@ -462,9 +462,10 @@ function drawTable() {
 /**
  * Dessine la ligne de visée améliorée
  */
-function drawAimLine(ball, mouseX, mouseY) {
-  const dx = ball.x - mouseX;
-  const dy = ball.y - mouseY;
+function drawAimLine(ball, dragVector) {
+  // La ligne de visée pointe dans la direction opposée au drag
+  const dx = -dragVector.x;
+  const dy = -dragVector.y;
   const distance = length(dx, dy);
   
   if (distance < 5) return;
@@ -628,7 +629,24 @@ export function render() {
   
   // Dessiner la ligne de visée si on fait glisser
   if (gameState.dragging && gameState.draggedBall) {
-    drawAimLine(gameState.draggedBall, gameState.dragStart.x, gameState.dragStart.y);
+    // Dessiner la ligne de drag (tirer vers l'arrière)
+    if (length(gameState.drag.x, gameState.drag.y) > 5) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.moveTo(gameState.draggedBall.x, gameState.draggedBall.y);
+      ctx.lineTo(
+        gameState.draggedBall.x + gameState.drag.x,
+        gameState.draggedBall.y + gameState.drag.y
+      );
+      ctx.stroke();
+      ctx.restore();
+    }
+    
+    // Dessiner la ligne de visée (direction du tir)
+    drawAimLine(gameState.draggedBall, gameState.drag);
   }
 }
 
@@ -671,8 +689,10 @@ function handlePointerDown(x, y) {
     if (dist < ball.radius + 10) {
       gameState.dragging = true;
       gameState.draggedBall = ball;
-      gameState.dragStart = { x, y };
+      gameState.drag = { x: 0, y: 0 };  // Réinitialiser le drag
       canvas.style.cursor = 'grabbing';
+      updateTurnIndicator(null); // Cacher l'indicateur de tour
+      showPowerMeter(true, 0);
     }
   });
 }
@@ -697,11 +717,23 @@ function handleTouchMove(e) {
 
 function handlePointerMove(x, y) {
   if (gameState.dragging && gameState.draggedBall) {
-    const dx = gameState.draggedBall.x - x;
-    const dy = gameState.draggedBall.y - y;
+    // Calculer le vecteur depuis la position actuelle vers la balle
+    const dx = x - gameState.draggedBall.x;
+    const dy = y - gameState.draggedBall.y;
     const dist = length(dx, dy);
-    const power = Math.min(dist / MAX_PULL_DISTANCE * 100, 100);
     
+    // Limiter la distance de drag à MAX_PULL_DISTANCE
+    const limitedDist = Math.min(dist, MAX_PULL_DISTANCE);
+    
+    // Normaliser et appliquer la distance limitée
+    if (dist > 0) {
+      const normalized = normalize(dx, dy);
+      gameState.drag.x = normalized.x * limitedDist;
+      gameState.drag.y = normalized.y * limitedDist;
+    }
+    
+    // Mettre à jour la jauge de puissance
+    const power = (limitedDist / MAX_PULL_DISTANCE) * 100;
     showPowerMeter(true, power);
   } else {
     // En mode IA, pas de curseur spécial pendant le tour de l'IA
@@ -736,14 +768,15 @@ function handleTouchEnd(e) {
 
 function handlePointerUp() {
   if (gameState.dragging && gameState.draggedBall) {
-    const dx = gameState.draggedBall.x - gameState.dragStart.x;
-    const dy = gameState.draggedBall.y - gameState.dragStart.y;
-    const distance = length(dx, dy);
+    const dist = length(gameState.drag.x, gameState.drag.y);
     
-    if (distance > 10) {
-      // Tirer !
-      const power = Math.min(distance / MAX_PULL_DISTANCE, 1);
-      const normalized = normalize(dx, dy);
+    if (dist > 10) {
+      // Calculer la puissance basée sur la distance de drag
+      const power = Math.min(dist / MAX_PULL_DISTANCE, 1);
+      
+      // Appliquer la vélocité dans la direction opposée au drag
+      // (on tire vers l'arrière pour propulser vers l'avant)
+      const normalized = normalize(-gameState.drag.x, -gameState.drag.y);
       
       gameState.draggedBall.vx = normalized.x * power * POWER_MULTIPLIER * 100;
       gameState.draggedBall.vy = normalized.y * power * POWER_MULTIPLIER * 100;
@@ -767,11 +800,15 @@ function handlePointerUp() {
       if (onShot && getGameMode && (getGameMode() === GAME_MODE.HOST || getGameMode() === GAME_MODE.GUEST)) {
         onShot(gameState.draggedBall.id, gameState.draggedBall.vx, gameState.draggedBall.vy);
       }
+    } else {
+      // Si le drag est trop court, restaurer l'indicateur de tour
+      updateTurnIndicator(gameState.currentTurn);
     }
   }
   
   gameState.dragging = false;
   gameState.draggedBall = null;
+  gameState.drag = { x: 0, y: 0 };
   canvas.style.cursor = 'default';
   showPowerMeter(false);
 }
