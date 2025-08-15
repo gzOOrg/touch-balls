@@ -793,14 +793,44 @@ export function render() {
 /**
  * Gestion de la souris/touch
  */
+/**
+ * Convertit les coordonnées de la souris en coordonnées du canvas
+ * en tenant compte du ratio entre la taille CSS et la taille réelle
+ */
+function getCanvasCoordinates(e, rect) {
+  // Obtenir les styles calculés pour tenir compte des bordures et padding
+  const style = window.getComputedStyle(canvas);
+  const borderLeft = parseInt(style.borderLeftWidth) || 0;
+  const borderTop = parseInt(style.borderTopWidth) || 0;
+  const paddingLeft = parseInt(style.paddingLeft) || 0;
+  const paddingTop = parseInt(style.paddingTop) || 0;
+  
+  // Taille réelle de la zone de dessin (sans bordures et padding)
+  const drawingWidth = rect.width - borderLeft - parseInt(style.borderRightWidth || 0) - paddingLeft - parseInt(style.paddingRight || 0);
+  const drawingHeight = rect.height - borderTop - parseInt(style.borderBottomWidth || 0) - paddingTop - parseInt(style.paddingBottom || 0);
+  
+  // Ratio entre la taille réelle du canvas et sa taille d'affichage
+  const scaleX = canvas.width / drawingWidth;
+  const scaleY = canvas.height / drawingHeight;
+  
+  // Position relative dans le canvas (en tenant compte des bordures et padding)
+  const x = (e.clientX - rect.left - borderLeft - paddingLeft) * scaleX;
+  const y = (e.clientY - rect.top - borderTop - paddingTop) * scaleY;
+  
+  // S'assurer que les coordonnées sont dans les limites du canvas
+  const clampedX = Math.max(0, Math.min(canvas.width, x));
+  const clampedY = Math.max(0, Math.min(canvas.height, y));
+  
+  return { x: clampedX, y: clampedY };
+}
+
 function handleMouseDown(e) {
   if (gameState.isShot || gameState.roundOver) return;
   
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const coords = getCanvasCoordinates(e, rect);
   
-  handlePointerDown(x, y);
+  handlePointerDown(coords.x, coords.y);
 }
 
 function handleTouchStart(e) {
@@ -809,10 +839,9 @@ function handleTouchStart(e) {
   
   const rect = canvas.getBoundingClientRect();
   const touch = e.touches[0];
-  const x = touch.clientX - rect.left;
-  const y = touch.clientY - rect.top;
+  const coords = getCanvasCoordinates(touch, rect);
   
-  handlePointerDown(x, y);
+  handlePointerDown(coords.x, coords.y);
 }
 
 function handlePointerDown(x, y) {
@@ -840,20 +869,18 @@ function handlePointerDown(x, y) {
 
 function handleMouseMove(e) {
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const coords = getCanvasCoordinates(e, rect);
   
-  handlePointerMove(x, y);
+  handlePointerMove(coords.x, coords.y);
 }
 
 function handleTouchMove(e) {
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
   const touch = e.touches[0];
-  const x = touch.clientX - rect.left;
-  const y = touch.clientY - rect.top;
+  const coords = getCanvasCoordinates(touch, rect);
   
-  handlePointerMove(x, y);
+  handlePointerMove(coords.x, coords.y);
 }
 
 function handlePointerMove(x, y) {

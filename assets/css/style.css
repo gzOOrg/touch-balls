@@ -75,6 +75,39 @@ body{
   50%{transform:scale(1.1)}
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.language-select {
+  background: rgba(0,0,0,0.8);
+  color: var(--neon-cyan);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.language-select:hover {
+  background: rgba(0,255,255,0.1);
+  box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.language-select:focus {
+  box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+.language-select option {
+  background: #0a0a0a;
+  color: #fff;
+}
+
 .brand-text{
   background:linear-gradient(45deg,var(--neon-cyan),var(--neon-pink));
   -webkit-background-clip:text;
@@ -368,6 +401,8 @@ canvas{
   z-index:2;
   touch-action:none;
   cursor:crosshair;
+  object-fit: contain;
+  user-select: none;
 }
 
 .hud{
@@ -812,6 +847,8 @@ canvas{
 @media (max-width: 768px) {
   .header{flex-direction:column;gap:15px}
   .brand{font-size:20px}
+  .header-controls{flex-direction:column;width:100%}
+  .language-select{width:100%}
   .row{flex-direction:column}
   .stars{justify-content:center}
   .scores-hud{flex-direction:column;gap:15px}
