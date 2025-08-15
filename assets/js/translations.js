@@ -60,7 +60,9 @@ export const translations = {
     round: "MANCHE",
     gameStarted: "PARTIE LANCÉE!",
     roundWon: "GAGNE LA MANCHE !",
-    matchWon: "GAGNE LA PARTIE !"
+    matchWon: "GAGNE LA PARTIE !",
+    player1Wins: "🏆 JOUEUR 1 GAGNE LA MANCHE !",
+    player2Wins: "🏆 JOUEUR 2 GAGNE LA MANCHE !"
   },
   
   nl: {
@@ -120,7 +122,18 @@ export const translations = {
     round: "RONDE",
     gameStarted: "SPEL GESTART!",
     roundWon: "WINT DE RONDE!",
-    matchWon: "WINT HET SPEL!"
+    matchWon: "WINT HET SPEL!",
+    player1Wins: "🏆 SPELER 1 WINT DE RONDE!",
+    player2Wins: "🏆 SPELER 2 WINT DE RONDE!",
+    
+    // Réseau
+    waitingForPeer: "Wachten op peer-verbinding...",
+    yourId: "JOUW ID",
+    peerId: "HOST ID",
+    connectionReady: "Verbinding klaar!",
+    disconnected: "heeft de verbinding verbroken",
+    connectionLost: "VERBINDING VERLOREN!",
+    connectedTo: "Verbonden met:"
   }
 };
 

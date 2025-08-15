@@ -9,6 +9,7 @@ import { copyToClipboard } from './utils.js';
 import { initGame, render, updatePhysics, startMatch, setDifficulty, gameState, setGameModeGetter, setNetworkCallbacks } from './game.js';
 import { aiPlayer } from './ai.js';
 import { network } from './network.js';
+import { t, setLanguage, getLanguage } from './translations.js';
 
 // Variables globales du jeu
 let gameMode = GAME_MODE.LOCAL;
@@ -331,8 +332,8 @@ async function handleMatchEnd(winner) {
   const timeStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   
   // Mettre à jour l'écran de victoire
-  document.getElementById('victoryTitle').textContent = '🏆 VICTOIRE ÉPIQUE! 🏆';
-  document.getElementById('victorySubtitle').textContent = `${winnerName} domine ${loserName}!`;
+  document.getElementById('victoryTitle').textContent = '🏆 ' + t('victory') + ' 🏆';
+  document.getElementById('victorySubtitle').textContent = `${winnerName} ${t('wins')} ${loserName}!`;
   document.getElementById('finalScore').textContent = finalScore;
   document.getElementById('totalShots').textContent = gameState.totalShots;
   document.getElementById('gameDuration').textContent = timeStr;
@@ -425,6 +426,93 @@ function goHome() {
   ui.toggleChat.style.display = 'none';
   ui.chatPanel.style.display = 'none';
   ui.networkPanel.style.display = 'block';
+}
+
+/**
+ * Met à jour tous les textes de l'interface
+ */
+function updateUITexts() {
+  // Titre du jeu
+  const gameTitle = document.getElementById('gameTitle');
+  if (gameTitle) gameTitle.textContent = t('gameTitle');
+  
+  // Boutons principaux
+  const restartBtn = document.getElementById('restartBtn');
+  if (restartBtn) restartBtn.textContent = t('newGame');
+  
+  ui.localBtn.textContent = t('local');
+  ui.aiBtn.textContent = t('vsAI');
+  ui.hostBtn.textContent = t('host');
+  ui.joinBtn.textContent = t('join');
+  
+  // Boutons de navigation
+  if (ui.homeBtn) ui.homeBtn.textContent = t('home');
+  if (ui.startBtn) ui.startBtn.textContent = t('ready');
+  
+  // Labels de mode de jeu
+  const gameModeLabels = document.querySelectorAll('label');
+  gameModeLabels.forEach(label => {
+    const text = label.textContent;
+    if (text.includes('MODE DE JEU')) {
+      label.childNodes[0].textContent = '🎮 ' + t('gameMode');
+    } else if (text.includes('DIFFICULTÉ')) {
+      label.childNodes[0].textContent = '🎯 ' + t('difficulty');
+    } else if (text.includes('NIVEAU DE L\'IA')) {
+      label.childNodes[0].textContent = '🤖 ' + t('aiLevel');
+    }
+  });
+  
+  // Niveaux de difficulté
+  const diff1Label = document.querySelector('label[for="diff1"]');
+  const diff2Label = document.querySelector('label[for="diff2"]');
+  const diff3Label = document.querySelector('label[for="diff3"]');
+  if (diff1Label) diff1Label.textContent = t('noob');
+  if (diff2Label) diff2Label.textContent = t('pro');
+  if (diff3Label) diff3Label.textContent = t('legend');
+  
+  // Niveaux d'IA
+  const ai1Label = document.querySelector('label[for="ai1"]');
+  const ai2Label = document.querySelector('label[for="ai2"]');
+  const ai3Label = document.querySelector('label[for="ai3"]');
+  if (ai1Label) ai1Label.textContent = t('dumb');
+  if (ai2Label) ai2Label.textContent = t('smart');
+  if (ai3Label) ai3Label.textContent = t('terminator');
+  
+  // Textes multijoueur
+  if (ui.cancelHost) ui.cancelHost.textContent = t('cancel');
+  if (ui.cancelJoin) ui.cancelJoin.textContent = t('cancel');
+  if (ui.cancelAI) ui.cancelAI.textContent = t('cancel');
+  if (ui.connectBtn) ui.connectBtn.textContent = t('connect');
+  if (ui.copyBtn) ui.copyBtn.textContent = t('copyId');
+  
+  // Placeholders
+  const p1Input = document.getElementById('p1');
+  const p2Input = document.getElementById('p2');
+  if (p1Input) p1Input.placeholder = t('player1');
+  if (p2Input) p2Input.placeholder = t('player2');
+  
+  // Écran de victoire
+  const victoryTitle = document.getElementById('victoryTitle');
+  if (victoryTitle) victoryTitle.textContent = '🏆 ' + t('victory') + ' 🏆';
+  
+  const playAgainBtn = document.getElementById('playAgainBtn');
+  if (playAgainBtn) playAgainBtn.textContent = '🎮 ' + t('rematch');
+  
+  const homeFromVictoryBtn = document.getElementById('homeFromVictoryBtn');
+  if (homeFromVictoryBtn) homeFromVictoryBtn.textContent = '🏠 ' + t('menu');
+  
+  // Labels des stats de victoire
+  const statLabels = document.querySelectorAll('.stat-label');
+  statLabels.forEach(label => {
+    const text = label.textContent;
+    if (text.includes('Score final') || text.includes('Eindscore')) {
+      label.textContent = t('finalScore');
+    } else if (text.includes('Tirs totaux') || text.includes('Totaal schoten')) {
+      label.textContent = t('totalShots');
+    } else if (text.includes('Durée') || text.includes('Duur')) {
+      label.textContent = t('duration');
+    }
+  });
 }
 
 /**
@@ -552,6 +640,29 @@ function initializeEvents() {
     console.log('ui.hostBtn:', ui.hostBtn);
     console.log('ui.joinBtn:', ui.joinBtn);
     return;
+  }
+  
+  // Initialiser la langue
+  const savedLanguage = localStorage.getItem('billardLanguage') || 'fr';
+  setLanguage(savedLanguage);
+  updateUITexts();
+  
+  // Sélecteur de langue
+  const languageSelector = document.getElementById('languageSelector');
+  if (languageSelector) {
+    languageSelector.value = savedLanguage;
+    languageSelector.addEventListener('change', (e) => {
+      const newLang = e.target.value;
+      setLanguage(newLang);
+      localStorage.setItem('billardLanguage', newLang);
+      updateUITexts();
+      
+      // Animation de feedback
+      languageSelector.style.animation = 'pulse 0.5s ease';
+      setTimeout(() => {
+        languageSelector.style.animation = '';
+      }, 500);
+    });
   }
   
   // Boutons de mode de jeu

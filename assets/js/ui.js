@@ -2,6 +2,8 @@
  * Module UI - Gestion de l'interface utilisateur
  */
 
+import { t } from './translations.js';
+
 // Objet UI qui sera rempli après le chargement du DOM
 export const ui = {};
 
@@ -134,7 +136,7 @@ export function updateTurnIndicator(player, hideTurn) {
   } else {
     // Afficher seulement si pas déjà affiché avec le même joueur
     const currentText = ui.tText.textContent;
-    const newText = `TOUR DE ${player.name}`;
+    const newText = `${t('playerTurn')} ${player.name}`;
     
     if (ui.tBanner.style.display === 'none' || currentText !== newText) {
       ui.tBanner.style.display = 'flex';

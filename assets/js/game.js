@@ -12,6 +12,7 @@ import {
 import { clamp, length, normalize, distance, dotProduct } from './utils.js';
 import { sfx } from './sfx.js';
 import { showPowerMeter, updateTurnIndicator, updateStats, showComboText } from './ui.js';
+import { t } from './translations.js';
 
 // État du jeu
 export const gameState = {
@@ -389,12 +390,12 @@ function checkHoles() {
       
       if (ball === gameState.redBall) {
         sfx.fallRed();
-        showComboText('RED BALL! 🎯');
+        showComboText(t('redBall'));
       } else {
         sfx.fall();
         // Message spécial si on fait tomber une boule adverse
         if (ball.owner !== null && ball.owner !== gameState.currentTurn) {
-          showComboText('NICE SHOT! 💀');
+          showComboText(t('niceShot'));
         }
       }
     }
@@ -444,19 +445,19 @@ function checkRoundEnd() {
     // La boule rouge est tombée - le joueur actuel gagne la manche !
     gameState.roundOver = true;
     gameState.roundWinner = gameState.currentTurn;
-    showComboText(`🏆 ${gameState.currentTurn === 0 ? 'JOUEUR 1' : 'JOUEUR 2'} GAGNE LA MANCHE !`);
+    showComboText(gameState.currentTurn === 0 ? t('player1Wins') : t('player2Wins'));
     sfx.victory();
   } else if (player1Balls === 0) {
     // Le joueur 1 n'a plus de boules - le joueur 2 gagne
     gameState.roundOver = true;
     gameState.roundWinner = 1;
-    showComboText('🏆 JOUEUR 2 GAGNE LA MANCHE !');
+    showComboText(t('player2Wins'));
     sfx.victory();
   } else if (player2Balls === 0) {
     // Le joueur 2 n'a plus de boules - le joueur 1 gagne
     gameState.roundOver = true;
     gameState.roundWinner = 0;
-    showComboText('🏆 JOUEUR 1 GAGNE LA MANCHE !');
+    showComboText(t('player1Wins'));
     sfx.victory();
   }
   
@@ -1004,10 +1005,10 @@ function handlePointerUp() {
       
       // Effets spéciaux selon la puissance
       if (power > 0.95) {
-        showComboText('MEGA SHOT! 🔥');
+        showComboText(t('megaShot'));
         sfx.epic();
       } else if (power > 0.8) {
-        showComboText('POWER SHOT!');
+        showComboText(t('powerShot'));
         sfx.epic();
       }
       
