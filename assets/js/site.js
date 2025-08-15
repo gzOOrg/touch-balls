@@ -398,6 +398,371 @@ document.addEventListener('DOMContentLoaded', () => {
 // Fonction globale pour le bouton hero
 window.scrollToSection = scrollToSection;
 
+// ====================================
+// SYSTÈME DE TRADUCTION
+// ====================================
+
+// Traductions pour la page d'accueil
+const siteTranslations = {
+  fr: {
+    // Navigation
+    'nav-home': 'Accueil',
+    'nav-features': 'Fonctionnalités',
+    'nav-game': 'Jouer',
+    'nav-about': 'À propos',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': 'Le billard réinventé',
+    'hero-description': 'Découvrez l\'expérience de billard la plus avancée du web ! Affrontez des IA intelligentes, jouez en multijoueur et profitez d\'une physique ultra-réaliste.',
+    'hero-play-btn': '🎱 JOUER MAINTENANT',
+    
+    // Stats
+    'stat-languages': 'Langues',
+    'stat-ai-levels': 'Niveaux d\'IA',
+    'stat-fun': 'Plaisir',
+    
+    // Features Section
+    'features-title': 'Fonctionnalités Épiques',
+    'ai-title': 'IA TERMINATOR',
+    'ai-desc': 'Affrontez notre IA la plus avancée ! TERMINATOR analyse des millions de trajectoires et s\'adapte à chaque situation de jeu.',
+    'ai-highlight': 'Ultra-Intelligent',
+    
+    'languages-title': '9 LANGUES',
+    'languages-desc': 'Jouez dans votre langue préférée ! Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語.',
+    'languages-highlight': 'Multilingue',
+    
+    'physics-title': 'PHYSIQUE RÉALISTE',
+    'physics-desc': 'Profitez d\'une simulation physique ultra-précise avec collisions réalistes, friction authentique et rebonds parfaits.',
+    'physics-highlight': 'Ultra-Réaliste',
+    
+    'multiplayer-title': 'MULTIJOUEUR',
+    'multiplayer-desc': 'Défiez vos amis en ligne ! Partagez simplement votre ID de partie et jouez ensemble de n\'importe où.',
+    'multiplayer-highlight': 'En Ligne',
+    
+    'difficulty-title': '3 DIFFICULTÉS',
+    'difficulty-desc': 'De NOOB à LEGEND, choisissez votre niveau de défi ! Trou géant, équilibré ou mode hardcore.',
+    'difficulty-highlight': 'Progressive',
+    
+    'responsive-title': 'RESPONSIVE',
+    'responsive-desc': 'Jouez sur PC, tablette ou mobile ! Interface adaptative et contrôles tactiles optimisés.',
+    'responsive-highlight': 'Partout',
+    
+    // Game Section
+    'game-title': 'Prêt à Jouer ?',
+    'local-title': 'LOCAL',
+    'local-desc': 'Jouez à deux sur le même appareil ! Parfait pour défier famille et amis.',
+    'local-btn': 'JOUER LOCAL',
+    
+    // About Section
+    'about-title': 'À Propos d\'Epic Billiards',
+    'about-future': 'Le billard du futur',
+    'about-future-desc': 'Epic Billiards repousse les limites du jeu de billard en ligne. Développé avec les dernières technologies web, notre jeu offre une expérience immersive et compétitive inégalée.',
+    'about-tech': 'Technologie avancée',
+    'about-tech-desc': 'Notre moteur physique propriétaire simule avec précision les collisions, la friction et les rebonds. L\'IA TERMINATOR utilise des algorithmes de pointe pour analyser des millions de trajectoires en temps réel.',
+    'about-community': 'Communauté mondiale',
+    'about-community-desc': 'Avec le support de 9 langues et le multijoueur en ligne, Epic Billiards rassemble une communauté mondiale de passionnés de billard.',
+    
+    // Footer
+    'footer-desc': 'Le meilleur jeu de billard en ligne. Gratuit, sans inscription.',
+    'footer-game': 'Jeu',
+    'footer-play': 'Jouer Maintenant',
+    'footer-support': 'Support',
+    'footer-source': 'Code Source',
+    'footer-contact': 'Contact',
+    'footer-languages': 'Langues Supportées',
+    'footer-copyright': '© 2024 Epic Billiards. Fait avec ❤️ et beaucoup de ☕'
+  },
+  
+  en: {
+    // Navigation
+    'nav-home': 'Home',
+    'nav-features': 'Features',
+    'nav-game': 'Play',
+    'nav-about': 'About',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': 'Billiards Reinvented',
+    'hero-description': 'Discover the most advanced billiards experience on the web! Face intelligent AIs, play multiplayer and enjoy ultra-realistic physics.',
+    'hero-play-btn': '🎱 PLAY NOW',
+    
+    // Stats
+    'stat-languages': 'Languages',
+    'stat-ai-levels': 'AI Levels',
+    'stat-fun': 'Fun',
+    
+    // Features Section
+    'features-title': 'Epic Features',
+    'ai-title': 'TERMINATOR AI',
+    'ai-desc': 'Face our most advanced AI! TERMINATOR analyzes millions of trajectories and adapts to every game situation.',
+    'ai-highlight': 'Ultra-Smart',
+    
+    'languages-title': '9 LANGUAGES',
+    'languages-desc': 'Play in your preferred language! Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語.',
+    'languages-highlight': 'Multilingual',
+    
+    'physics-title': 'REALISTIC PHYSICS',
+    'physics-desc': 'Enjoy ultra-precise physics simulation with realistic collisions, authentic friction and perfect bounces.',
+    'physics-highlight': 'Ultra-Realistic',
+    
+    'multiplayer-title': 'MULTIPLAYER',
+    'multiplayer-desc': 'Challenge your friends online! Simply share your game ID and play together from anywhere.',
+    'multiplayer-highlight': 'Online',
+    
+    'difficulty-title': '3 DIFFICULTIES',
+    'difficulty-desc': 'From NOOB to LEGEND, choose your challenge level! Giant hole, balanced or hardcore mode.',
+    'difficulty-highlight': 'Progressive',
+    
+    'responsive-title': 'RESPONSIVE',
+    'responsive-desc': 'Play on PC, tablet or mobile! Adaptive interface and optimized touch controls.',
+    'responsive-highlight': 'Everywhere',
+    
+    // Game Section
+    'game-title': 'Ready to Play?',
+    'local-title': 'LOCAL',
+    'local-desc': 'Play two players on the same device! Perfect for challenging family and friends.',
+    'local-btn': 'PLAY LOCAL',
+    
+    // About Section
+    'about-title': 'About Epic Billiards',
+    'about-future': 'The future of billiards',
+    'about-future-desc': 'Epic Billiards pushes the boundaries of online billiards gaming. Developed with the latest web technologies, our game offers an unmatched immersive and competitive experience.',
+    'about-tech': 'Advanced technology',
+    'about-tech-desc': 'Our proprietary physics engine accurately simulates collisions, friction and bounces. The TERMINATOR AI uses cutting-edge algorithms to analyze millions of trajectories in real time.',
+    'about-community': 'Global community',
+    'about-community-desc': 'With support for 9 languages and online multiplayer, Epic Billiards brings together a global community of billiards enthusiasts.',
+    
+    // Footer
+    'footer-desc': 'The best online billiards game. Free, no registration required.',
+    'footer-game': 'Game',
+    'footer-play': 'Play Now',
+    'footer-support': 'Support',
+    'footer-source': 'Source Code',
+    'footer-contact': 'Contact',
+    'footer-languages': 'Supported Languages',
+    'footer-copyright': '© 2024 Epic Billiards. Made with ❤️ and lots of ☕'
+  },
+  
+  de: {
+    // Navigation
+    'nav-home': 'Startseite',
+    'nav-features': 'Funktionen',
+    'nav-game': 'Spielen',
+    'nav-about': 'Über uns',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': 'Billard neu erfunden',
+    'hero-description': 'Entdecken Sie das fortschrittlichste Billard-Erlebnis im Web! Fordern Sie intelligente KIs heraus, spielen Sie Multiplayer und genießen Sie ultra-realistische Physik.',
+    'hero-play-btn': '🎱 JETZT SPIELEN',
+    
+    // Stats
+    'stat-languages': 'Sprachen',
+    'stat-ai-levels': 'KI-Level',
+    'stat-fun': 'Spaß',
+    
+    // Features Section
+    'features-title': 'Epische Funktionen',
+    'ai-title': 'TERMINATOR KI',
+    'ai-desc': 'Fordern Sie unsere fortschrittlichste KI heraus! TERMINATOR analysiert Millionen von Trajektorien und passt sich jeder Spielsituation an.',
+    'ai-highlight': 'Ultra-Intelligent',
+    
+    'languages-title': '9 SPRACHEN',
+    'languages-desc': 'Spielen Sie in Ihrer bevorzugten Sprache! Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語.',
+    'languages-highlight': 'Mehrsprachig',
+    
+    'physics-title': 'REALISTISCHE PHYSIK',
+    'physics-desc': 'Genießen Sie ultra-präzise Physiksimulation mit realistischen Kollisionen, authentischer Reibung und perfekten Sprüngen.',
+    'physics-highlight': 'Ultra-Realistisch',
+    
+    'multiplayer-title': 'MEHRSPIELER',
+    'multiplayer-desc': 'Fordern Sie Ihre Freunde online heraus! Teilen Sie einfach Ihre Spiel-ID und spielen Sie zusammen von überall.',
+    'multiplayer-highlight': 'Online',
+    
+    'difficulty-title': '3 SCHWIERIGKEITEN',
+    'difficulty-desc': 'Von ANFÄNGER bis LEGENDE, wählen Sie Ihr Herausforderungslevel! Riesenloch, ausgewogen oder Hardcore-Modus.',
+    'difficulty-highlight': 'Progressiv',
+    
+    'responsive-title': 'RESPONSIVE',
+    'responsive-desc': 'Spielen Sie auf PC, Tablet oder Handy! Adaptive Benutzeroberfläche und optimierte Touch-Steuerung.',
+    'responsive-highlight': 'Überall',
+    
+    // Game Section
+    'game-title': 'Bereit zu spielen?',
+    'local-title': 'LOKAL',
+    'local-desc': 'Spielen Sie zu zweit auf demselben Gerät! Perfekt, um Familie und Freunde herauszufordern.',
+    'local-btn': 'LOKAL SPIELEN',
+    
+    // About Section
+    'about-title': 'Über Epic Billiards',
+    'about-future': 'Die Zukunft des Billards',
+    'about-future-desc': 'Epic Billiards erweitert die Grenzen des Online-Billard-Spiels. Mit den neuesten Web-Technologien entwickelt, bietet unser Spiel ein unvergleichliches immersives und wettbewerbsfähiges Erlebnis.',
+    'about-tech': 'Fortschrittliche Technologie',
+    'about-tech-desc': 'Unsere proprietäre Physik-Engine simuliert präzise Kollisionen, Reibung und Sprünge. Die TERMINATOR KI verwendet modernste Algorithmen, um Millionen von Trajektorien in Echtzeit zu analysieren.',
+    'about-community': 'Globale Gemeinschaft',
+    'about-community-desc': 'Mit Unterstützung für 9 Sprachen und Online-Multiplayer bringt Epic Billiards eine globale Gemeinschaft von Billard-Enthusiasten zusammen.',
+    
+    // Footer
+    'footer-desc': 'Das beste Online-Billardspiel. Kostenlos, keine Registrierung erforderlich.',
+    'footer-game': 'Spiel',
+    'footer-play': 'Jetzt spielen',
+    'footer-support': 'Support',
+    'footer-source': 'Quellcode',
+    'footer-contact': 'Kontakt',
+    'footer-languages': 'Unterstützte Sprachen',
+    'footer-copyright': '© 2024 Epic Billiards. Gemacht mit ❤️ und viel ☕'
+  },
+  
+  nl: {
+    // Navigation
+    'nav-home': 'Home',
+    'nav-features': 'Functies',
+    'nav-game': 'Spelen',
+    'nav-about': 'Over ons',
+    
+    // Hero Section
+    'hero-title': 'EPIC BILLIARDS',
+    'hero-subtitle': 'Biljart heruitgevonden',
+    'hero-description': 'Ontdek de meest geavanceerde biljartervaring op het web! Daag intelligente AI\'s uit, speel multiplayer en geniet van ultra-realistische fysica.',
+    'hero-play-btn': '🎱 NU SPELEN',
+    
+    // Stats
+    'stat-languages': 'Talen',
+    'stat-ai-levels': 'AI Niveaus',
+    'stat-fun': 'Plezier',
+    
+    // Features Section
+    'features-title': 'Epische Functies',
+    'ai-title': 'TERMINATOR AI',
+    'ai-desc': 'Daag onze meest geavanceerde AI uit! TERMINATOR analyseert miljoenen trajecten en past zich aan elke spelsituatie aan.',
+    'ai-highlight': 'Ultra-Slim',
+    
+    'languages-title': '9 TALEN',
+    'languages-desc': 'Speel in je voorkeurstaal! Français, English, Deutsch, Español, 中文, العربية, Nederlands, Lëtzebuergesch, 日本語.',
+    'languages-highlight': 'Meertalig',
+    
+    'physics-title': 'REALISTISCHE FYSICA',
+    'physics-desc': 'Geniet van ultra-precieze fysicasimulatie met realistische botsingen, authentieke wrijving en perfecte stuiters.',
+    'physics-highlight': 'Ultra-Realistisch',
+    
+    'multiplayer-title': 'MULTIPLAYER',
+    'multiplayer-desc': 'Daag je vrienden online uit! Deel gewoon je spel-ID en speel samen vanaf elke locatie.',
+    'multiplayer-highlight': 'Online',
+    
+    'difficulty-title': '3 MOEILIJKHEDEN',
+    'difficulty-desc': 'Van NOOB tot LEGENDE, kies je uitdagingsniveau! Reuze gat, gebalanceerd of hardcore modus.',
+    'difficulty-highlight': 'Progressief',
+    
+    'responsive-title': 'RESPONSIVE',
+    'responsive-desc': 'Speel op PC, tablet of mobiel! Adaptieve interface en geoptimaliseerde aanraakbediening.',
+    'responsive-highlight': 'Overal',
+    
+    // Game Section
+    'game-title': 'Klaar om te spelen?',
+    'local-title': 'LOKAAL',
+    'local-desc': 'Speel met twee spelers op hetzelfde apparaat! Perfect om familie en vrienden uit te dagen.',
+    'local-btn': 'LOKAAL SPELEN',
+    
+    // About Section
+    'about-title': 'Over Epic Billiards',
+    'about-future': 'De toekomst van biljart',
+    'about-future-desc': 'Epic Billiards verlegt de grenzen van online biljartspellen. Ontwikkeld met de nieuwste webtechnologieën, biedt ons spel een ongeëvenaarde meeslepende en competitieve ervaring.',
+    'about-tech': 'Geavanceerde technologie',
+    'about-tech-desc': 'Onze eigen fysica-engine simuleert nauwkeurig botsingen, wrijving en stuiters. De TERMINATOR AI gebruikt geavanceerde algoritmen om miljoenen trajecten in realtime te analyseren.',
+    'about-community': 'Wereldwijde gemeenschap',
+    'about-community-desc': 'Met ondersteuning voor 9 talen en online multiplayer brengt Epic Billiards een wereldwijde gemeenschap van biljartliefhebbers samen.',
+    
+    // Footer
+    'footer-desc': 'Het beste online biljartspel. Gratis, geen registratie vereist.',
+    'footer-game': 'Spel',
+    'footer-play': 'Nu Spelen',
+    'footer-support': 'Ondersteuning',
+    'footer-source': 'Broncode',
+    'footer-contact': 'Contact',
+    'footer-languages': 'Ondersteunde Talen',
+    'footer-copyright': '© 2024 Epic Billiards. Gemaakt met ❤️ en veel ☕'
+  }
+};
+
+/**
+ * Configurer les boutons de langue
+ */
+function setupLanguageButtons() {
+  const langButtons = document.querySelectorAll('.hero-lang-btn');
+  
+  langButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const lang = this.getAttribute('data-lang');
+      setLanguage(lang);
+    });
+  });
+}
+
+/**
+ * Définir la langue et traduire la page
+ */
+function setLanguage(lang) {
+  // Sauvegarder la langue
+  localStorage.setItem('epic-billiards-language', lang);
+  
+  // Mettre à jour les boutons actifs
+  const langButtons = document.querySelectorAll('.hero-lang-btn');
+  langButtons.forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-lang') === lang) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Traduire tous les éléments
+  translatePage(lang);
+}
+
+/**
+ * Traduire la page
+ */
+function translatePage(lang) {
+  const translations = siteTranslations[lang] || siteTranslations.fr;
+  
+  // Traduire par data-translate
+  document.querySelectorAll('[data-translate]').forEach(element => {
+    const key = element.getAttribute('data-translate');
+    if (translations[key]) {
+      element.textContent = translations[key];
+    }
+  });
+  
+  // Traduire les éléments spécifiques par ID ou classe
+  const elementsToTranslate = {
+    // Navigation
+    '.nav-link[href="#home"]': 'nav-home',
+    '.nav-link[href="#features"]': 'nav-features', 
+    '.nav-link[href="#game"]': 'nav-game',
+    '.nav-link[href="#about"]': 'nav-about',
+    
+    // Hero
+    '.title-main': 'hero-title',
+    '.title-sub': 'hero-subtitle',
+    '.hero-description': 'hero-description',
+    '.btn-hero-primary': 'hero-play-btn',
+    
+    // Stats
+    '.hero-stats .stat:nth-child(1) .stat-label': 'stat-languages',
+    '.hero-stats .stat:nth-child(2) .stat-label': 'stat-ai-levels', 
+    '.hero-stats .stat:nth-child(3) .stat-label': 'stat-fun'
+  };
+  
+  Object.entries(elementsToTranslate).forEach(([selector, key]) => {
+    const element = document.querySelector(selector);
+    if (element && translations[key]) {
+      element.textContent = translations[key];
+    }
+  });
+  
+  console.log(`🌍 Page traduite en ${lang.toUpperCase()}`);
+}
+
 /**
  * Configuration des boutons de langue
  */
