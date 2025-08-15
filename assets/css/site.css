@@ -222,6 +222,9 @@ body {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
+  position: relative;
+  z-index: 999;
+  pointer-events: auto;
 }
 
 .btn-hero-primary:hover {
@@ -242,6 +245,9 @@ body {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
+  position: relative;
+  z-index: 999;
+  pointer-events: auto;
 }
 
 .btn-hero-secondary:hover {
