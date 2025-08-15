@@ -217,45 +217,51 @@ export class AI {
     
     // Pour chaque boule jouable
     for (const ball of playableBalls) {
-      // 1. Tir direct sur la rouge
-      const toRedAngle = Math.atan2(redBall.y - ball.y, redBall.x - ball.x);
-      const redToHoleAngle = Math.atan2(holeY - redBall.y, holeX - redBall.x);
-      let angleDiff = Math.abs(toRedAngle - redToHoleAngle);
-      // Normaliser l'angle entre 0 et PI
-      if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+      // Vérifier si le trou est entre la boule et la rouge
+      const holeBetweenBalls = this.isHoleBetweenBalls(ball, redBall, holeX, holeY);
       
-      if (angleDiff < Math.PI / 4) { // Alignement proche (45 degrés)
-        // Tester plusieurs puissances pour un one-shot direct
-        for (let power = 0.5; power <= 1; power += 0.05) {
-          const vx = Math.cos(toRedAngle) * power * POWER_MULTIPLIER * 100;
-          const vy = Math.sin(toRedAngle) * power * POWER_MULTIPLIER * 100;
-          
-          const simResult = this.simulateFullShot(ball, vx, vy);
-          
-          // Vérifier si c'est un one-shot
-          const redInHoleEvent = simResult.events.find(e => e.type === 'redInHole');
-          if (redInHoleEvent && redInHoleEvent.step < 200) {
-            const shotScore = simResult.score + this.config.oneShotBonus;
-            if (shotScore > bestOneShotScore) {
-              bestOneShotScore = shotScore;
-              bestOneShot = {
-                ball,
-                angle: toRedAngle,
-                power,
-                score: shotScore
-              };
+      if (!holeBetweenBalls) {
+        // 1. Tir direct sur la rouge (pas de trou entre les deux)
+        const toRedAngle = Math.atan2(redBall.y - ball.y, redBall.x - ball.x);
+        const redToHoleAngle = Math.atan2(holeY - redBall.y, holeX - redBall.x);
+        let angleDiff = Math.abs(toRedAngle - redToHoleAngle);
+        // Normaliser l'angle entre 0 et PI
+        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+        
+        if (angleDiff < Math.PI / 3) { // Alignement plus large (60 degrés)
+          // Tester plusieurs puissances pour un one-shot direct
+          for (let power = 0.4; power <= 1; power += 0.05) {
+            const vx = Math.cos(toRedAngle) * power * POWER_MULTIPLIER * 100;
+            const vy = Math.sin(toRedAngle) * power * POWER_MULTIPLIER * 100;
+            
+            const simResult = this.simulateFullShot(ball, vx, vy);
+            
+            // Vérifier si c'est un one-shot
+            const redInHoleEvent = simResult.events.find(e => e.type === 'redInHole');
+            if (redInHoleEvent && redInHoleEvent.step < 250) {
+              const shotScore = simResult.score + this.config.oneShotBonus;
+              if (shotScore > bestOneShotScore) {
+                bestOneShotScore = shotScore;
+                bestOneShot = {
+                  ball,
+                  angle: toRedAngle,
+                  power,
+                  score: shotScore,
+                  type: 'direct'
+                };
+              }
             }
           }
         }
       }
       
-      // 2. Tirs avec rebonds calculés (pour TERMINATOR uniquement)
+      // 2. Tirs avec rebonds calculés (pour contourner le trou)
       // Tester des angles variés pour des rebonds
-      for (let angle = 0; angle < 360; angle += 15) {
+      for (let angle = 0; angle < 360; angle += 10) { // Plus précis
         const testAngle = angle * Math.PI / 180;
         
         // Simuler pour voir si on peut toucher la rouge après rebond
-        for (let power = 0.7; power <= 1; power += 0.1) {
+        for (let power = 0.6; power <= 1; power += 0.08) {
           const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
           const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
           
@@ -265,7 +271,7 @@ export class AI {
           const hitRedEvent = simResult.events.find(e => e.type === 'hitRed');
           const redInHoleEvent = simResult.events.find(e => e.type === 'redInHole');
           
-          if (hitRedEvent && redInHoleEvent && redInHoleEvent.step < 300) {
+          if (hitRedEvent && redInHoleEvent && redInHoleEvent.step < 400) {
             const shotScore = simResult.score + this.config.oneShotBonus / 2; // Moins de bonus pour les rebonds
             if (shotScore > bestOneShotScore) {
               bestOneShotScore = shotScore;
@@ -273,8 +279,39 @@ export class AI {
                 ball,
                 angle: testAngle,
                 power,
-                score: shotScore
+                score: shotScore,
+                type: 'rebond'
               };
+            }
+          }
+        }
+      }
+      
+      // 3. Si le trou est entre les deux, chercher des tirs tactiques
+      if (holeBetweenBalls) {
+        // Chercher des tirs qui déplacent la rouge vers une meilleure position
+        for (let angle = 0; angle < 360; angle += 20) {
+          const testAngle = angle * Math.PI / 180;
+          
+          for (let power = 0.4; power <= 0.8; power += 0.1) {
+            const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+            const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+            
+            const simResult = this.simulateFullShot(ball, vx, vy);
+            
+            // Bonus pour déplacer la rouge vers une meilleure position
+            if (simResult.events.some(e => e.type === 'hitRed')) {
+              const shotScore = simResult.score + 200; // Bonus pour déplacer la rouge
+              if (shotScore > bestOneShotScore) {
+                bestOneShotScore = shotScore;
+                bestOneShot = {
+                  ball,
+                  angle: testAngle,
+                  power,
+                  score: shotScore,
+                  type: 'tactique'
+                };
+              }
             }
           }
         }
@@ -282,12 +319,33 @@ export class AI {
     }
     
     // Ne retourner que si on a trouvé un très bon one-shot
-    if (bestOneShot && bestOneShotScore > 3000) {
-      console.log('💀 TERMINATOR: One-shot calculé avec score:', Math.round(bestOneShotScore));
+    if (bestOneShot && bestOneShotScore > 2000) {
+      console.log(`💀 TERMINATOR: One-shot ${bestOneShot.type} calculé avec score:`, Math.round(bestOneShotScore));
       return bestOneShot;
     }
     
     return null;
+  }
+  
+  /**
+   * Vérifie si le trou est entre deux boules
+   */
+  isHoleBetweenBalls(ball1, ball2, holeX, holeY) {
+    // Distance entre les deux boules
+    const ballDistance = distance(ball1.x, ball1.y, ball2.x, ball2.y);
+    
+    // Distance de la boule 1 au trou
+    const dist1ToHole = distance(ball1.x, ball1.y, holeX, holeY);
+    
+    // Distance de la boule 2 au trou
+    const dist2ToHole = distance(ball2.x, ball2.y, holeX, holeY);
+    
+    // Si le trou est plus proche des deux boules que la distance entre elles
+    // ET que la somme des distances au trou est proche de la distance entre boules
+    const totalDistToHole = dist1ToHole + dist2ToHole;
+    const tolerance = ballDistance * 0.3; // Tolérance de 30%
+    
+    return Math.abs(totalDistToHole - ballDistance) < tolerance;
   }
   
   /**
@@ -334,11 +392,26 @@ export class AI {
         // Bonus si la rouge est alignée avec le trou
         const holeX = CANVAS_WIDTH / 2;
         const holeY = CANVAS_HEIGHT / 2;
-        const holeDirection = normalize(holeX - redBall.x, holeY - redBall.y);
-        const redPushAlignment = dotProduct(redDirection, holeDirection);
         
-        if (redPushAlignment > 0.5) {
-          score += 500; // Énorme bonus pour un tir gagnant potentiel
+        // Vérifier si le trou est entre les deux boules
+        const holeBetweenBalls = this.isHoleBetweenBalls(ball, redBall, holeX, holeY);
+        
+        if (!holeBetweenBalls) {
+          // Pas de trou entre les deux - possibilité de tir direct
+          const holeDirection = normalize(holeX - redBall.x, holeY - redBall.y);
+          const redPushAlignment = dotProduct(redDirection, holeDirection);
+          
+          if (redPushAlignment > 0.5) {
+            score += 800; // Énorme bonus pour un one-shot direct possible
+          } else if (redPushAlignment > 0.3) {
+            score += 400; // Bonus pour un one-shot difficile
+          }
+        } else {
+          // Trou entre les deux - pénalité mais possibilité de rebond
+          score -= 200;
+          
+          // Bonus pour les positions qui permettent des rebonds
+          if (redDist < 150) score += 100; // Proche = rebond plus facile
         }
       }
     }
@@ -674,6 +747,8 @@ export class AI {
         // Effet sonore spécial pour les one-shots
         setTimeout(() => sfx.epic(), 100);
         setTimeout(() => sfx.victory(), 300);
+      } else if (shot.score > 2000 && shot.type === 'tactique') {
+        showComboText('🎯 POSITION TACTIQUE!');
       } else if (shot.score > this.config.comboThreshold) {
         showComboText(t('aiQuantum'));
       } else if (shot.score > 500) {
