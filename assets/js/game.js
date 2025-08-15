@@ -30,7 +30,10 @@ export const gameState = {
   holeSize: HOLE_SIZES[2], // Pro par défaut
   gameStartTime: 0,
   currentStreak: 0,
-  totalShots: 0
+  totalShots: 0,
+  // Debug
+  debugClick: null,
+  showDebug: false
 };
 
 // Canvas et contexte
@@ -788,6 +791,35 @@ export function render() {
     // Dessiner la ligne de visée (direction du tir)
     drawAimLine(gameState.draggedBall, gameState.drag);
   }
+  
+  // Afficher le point de clic pour le debug
+  if (gameState.showDebug && gameState.debugClick) {
+    ctx.save();
+    
+    // Croix rouge au point de clic
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 2;
+    const size = 10;
+    ctx.beginPath();
+    ctx.moveTo(gameState.debugClick.x - size, gameState.debugClick.y);
+    ctx.lineTo(gameState.debugClick.x + size, gameState.debugClick.y);
+    ctx.moveTo(gameState.debugClick.x, gameState.debugClick.y - size);
+    ctx.lineTo(gameState.debugClick.x, gameState.debugClick.y + size);
+    ctx.stroke();
+    
+    // Cercle autour
+    ctx.beginPath();
+    ctx.arc(gameState.debugClick.x, gameState.debugClick.y, 20, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Texte avec les coordonnées
+    ctx.fillStyle = '#ff0000';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(`(${Math.round(gameState.debugClick.x)}, ${Math.round(gameState.debugClick.y)})`, 
+                 gameState.debugClick.x + 25, gameState.debugClick.y - 5);
+    
+    ctx.restore();
+  }
 }
 
 /**
@@ -845,18 +877,23 @@ function handleTouchStart(e) {
 }
 
 function handlePointerDown(x, y) {
+  // Enregistrer la position du clic pour le debug
+  gameState.debugClick = { x, y, time: Date.now() };
+  
   // En mode IA, empêcher le joueur de jouer pendant le tour de l'IA
   if (getGameMode && getGameMode() === GAME_MODE.AI && gameState.currentTurn === 1) {
     return;
   }
   
   // Vérifier si on clique sur une boule du joueur actuel
+  let ballClicked = false;
   gameState.balls.forEach(ball => {
     // Ne pas permettre de déplacer la boule rouge ou les boules inactives
     if (!ball.isActive || ball === gameState.redBall || ball.owner !== gameState.currentTurn) return;
     
     const dist = distance(x, y, ball.x, ball.y);
     if (dist < ball.radius + 10) {
+      ballClicked = true;
       gameState.dragging = true;
       gameState.draggedBall = ball;
       gameState.drag = { x: 0, y: 0 };  // Réinitialiser le drag
@@ -865,6 +902,15 @@ function handlePointerDown(x, y) {
       showPowerMeter(true, 0);
     }
   });
+  
+  // Si on clique mais pas sur une boule, afficher le debug pendant 2 secondes
+  if (!ballClicked) {
+    gameState.showDebug = true;
+    setTimeout(() => {
+      gameState.showDebug = false;
+      gameState.debugClick = null;
+    }, 2000);
+  }
 }
 
 function handleMouseMove(e) {
