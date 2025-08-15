@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎱 Intégrer Billard Épique</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #00ffff;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            text-shadow: 0 0 20px #00ffff;
+        }
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        code {
+            color: #00ff00;
+            font-size: 14px;
+        }
+        .preview {
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 0 30px #00ffff40;
+        }
+        iframe {
+            border: none;
+            border-radius: 5px;
+        }
+        .copy-btn {
+            background: #00ffff;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            box-shadow: 0 0 20px #00ffff;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎱 Intégrer Billard Épique</h1>
+        
+        <h2>📱 Partager sur les réseaux</h2>
+        <div class="code-block">
+            <code>
+                🎮 Jouez à Billard Épique !<br>
+                🎱 4 modes de jeu<br>
+                🤖 IA avec 3 niveaux<br>
+                🌐 Multijoueur P2P<br>
+                ➡️ https://gzorg-zog.github.io/touch-balls/
+            </code>
+        </div>
+
+        <h2>🖼️ Intégrer dans un site web</h2>
+        <p>Copiez ce code pour intégrer le jeu dans votre site :</p>
+        
+        <h3>Version plein écran :</h3>
+        <div class="code-block">
+            <code id="fullscreen-code">&lt;iframe 
+    src="https://gzorg-zog.github.io/touch-balls/" 
+    width="100%" 
+    height="600" 
+    frameborder="0"
+    style="border-radius: 10px; box-shadow: 0 0 20px rgba(0,255,255,0.5);"&gt;
+&lt;/iframe&gt;</code>
+            <button class="copy-btn" onclick="copyCode('fullscreen-code')">📋 Copier</button>
+        </div>
+
+        <h3>Version compacte :</h3>
+        <div class="code-block">
+            <code id="compact-code">&lt;iframe 
+    src="https://gzorg-zog.github.io/touch-balls/" 
+    width="400" 
+    height="300" 
+    frameborder="0"
+    style="border-radius: 10px;"&gt;
+&lt;/iframe&gt;</code>
+            <button class="copy-btn" onclick="copyCode('compact-code')">📋 Copier</button>
+        </div>
+
+        <h3>Lien avec aperçu :</h3>
+        <div class="code-block">
+            <code id="link-code">&lt;a href="https://gzorg-zog.github.io/touch-balls/" target="_blank" style="text-decoration: none;"&gt;
+    &lt;div style="background: #0a0a0a; color: #00ffff; padding: 20px; border-radius: 10px; border: 2px solid #00ffff; text-align: center;"&gt;
+        &lt;h3 style="margin: 0;"&gt;🎱 Billard Épique&lt;/h3&gt;
+        &lt;p&gt;Cliquez pour jouer !&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/a&gt;</code>
+            <button class="copy-btn" onclick="copyCode('link-code')">📋 Copier</button>
+        </div>
+
+        <h2>📧 Partager par email</h2>
+        <div class="code-block">
+            <code>
+                Objet : 🎱 Découvre ce jeu de billard génial !<br><br>
+                Salut !<br><br>
+                Je viens de découvrir ce super jeu de billard en ligne :<br>
+                https://gzorg-zog.github.io/touch-balls/<br><br>
+                • Mode solo contre l'IA (3 niveaux)<br>
+                • Multijoueur en P2P<br>
+                • Graphismes néon cyberpunk<br>
+                • Gratuit et sans installation !<br><br>
+                À bientôt sur le billard ! 🎮
+            </code>
+        </div>
+
+        <h2>🎮 Aperçu</h2>
+        <div class="preview">
+            <iframe 
+                src="billard.html" 
+                width="100%" 
+                height="400" 
+                frameborder="0"
+                style="border-radius: 5px;">
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function copyCode(elementId) {
+            const code = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('✅ Code copié dans le presse-papier !');
+            });
+        }
+    </script>
+</body>
+</html>
