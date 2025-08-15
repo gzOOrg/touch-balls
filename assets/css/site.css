@@ -111,6 +111,62 @@ body {
   width: 100%;
 }
 
+/* Navigation Greetings */
+.nav-greetings {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.greeting {
+  color: var(--text-gray);
+  transition: all 0.3s ease;
+  animation: colorShift 3s infinite alternate;
+}
+
+.greeting:hover {
+  color: var(--primary-color);
+  text-shadow: var(--shadow-neon);
+  transform: scale(1.1);
+}
+
+.neon-dot {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+  animation: neonPulse 2s infinite;
+  text-shadow: 
+    0 0 5px var(--accent-color),
+    0 0 10px var(--accent-color),
+    0 0 15px var(--accent-color);
+}
+
+@keyframes neonPulse {
+  0%, 100% { 
+    opacity: 1;
+    text-shadow: 
+      0 0 5px var(--accent-color),
+      0 0 10px var(--accent-color),
+      0 0 15px var(--accent-color);
+  }
+  50% { 
+    opacity: 0.7;
+    text-shadow: 
+      0 0 2px var(--accent-color),
+      0 0 5px var(--accent-color),
+      0 0 8px var(--accent-color);
+  }
+}
+
+@keyframes colorShift {
+  0% { color: var(--text-gray); }
+  25% { color: var(--primary-color); }
+  50% { color: var(--secondary-color); }
+  75% { color: var(--accent-color); }
+  100% { color: var(--text-gray); }
+}
+
 .btn-primary {
   background: var(--gradient-primary);
   border: none;
@@ -740,6 +796,21 @@ section {
 @media (max-width: 768px) {
   .nav-menu {
     display: none;
+  }
+  
+  .nav-greetings {
+    font-size: 0.8rem;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .greeting {
+    font-size: 0.7rem;
+  }
+  
+  .neon-dot {
+    font-size: 1rem;
   }
   
   .hero .container {
