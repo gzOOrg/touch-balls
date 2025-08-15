@@ -63,16 +63,20 @@ body {
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
   color: var(--primary-color);
   text-decoration: none;
 }
 
-.nav-brand .logo {
-  font-size: 2rem;
-  filter: drop-shadow(var(--shadow-neon));
+.brand-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(0,255,255,0.3);
 }
 
 .nav-menu {
@@ -930,23 +934,8 @@ section {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .nav-menu {
-    display: none;
-  }
-  
-  .nav-greetings {
-    font-size: 0.8rem;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .greeting {
-    font-size: 0.7rem;
-  }
-  
-  .neon-dot {
-    font-size: 1rem;
+  .navbar {
+    display: none; /* Supprime toute la navigation sur mobile */
   }
   
   .hero .container {
