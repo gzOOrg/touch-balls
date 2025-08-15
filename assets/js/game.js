@@ -691,7 +691,7 @@ function handlePointerDown(x, y) {
       gameState.draggedBall = ball;
       gameState.drag = { x: 0, y: 0 };  // Réinitialiser le drag
       canvas.style.cursor = 'grabbing';
-      updateTurnIndicator(null); // Cacher l'indicateur de tour
+      updateTurnIndicator(null, true); // Cacher l'indicateur de tour
       showPowerMeter(true, 0);
     }
   });
@@ -800,9 +800,6 @@ function handlePointerUp() {
       if (onShot && getGameMode && (getGameMode() === GAME_MODE.HOST || getGameMode() === GAME_MODE.GUEST)) {
         onShot(gameState.draggedBall.id, gameState.draggedBall.vx, gameState.draggedBall.vy);
       }
-    } else {
-      // Si le drag est trop court, restaurer l'indicateur de tour
-      updateTurnIndicator(gameState.currentTurn);
     }
   }
   

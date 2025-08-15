@@ -117,25 +117,43 @@ export function updateScores(players) {
 /**
  * Met à jour l'indicateur de tour
  */
+let turnIndicatorTimeout = null;
+
 export function updateTurnIndicator(player, hideTurn) {
-  if (hideTurn) {
-    ui.tBanner.style.display = 'none';
+  // Annuler tout timeout en cours
+  if (turnIndicatorTimeout) {
+    clearTimeout(turnIndicatorTimeout);
+    turnIndicatorTimeout = null;
+  }
+  
+  if (hideTurn || !player) {
+    // Cacher seulement si pas déjà caché
+    if (ui.tBanner.style.display !== 'none') {
+      ui.tBanner.style.display = 'none';
+    }
   } else {
-    ui.tBanner.style.display = 'flex';
-    ui.tText.textContent = `TOUR DE ${player.name}`;
-    ui.tBall.className = `turn-ball ${player.color}`;
+    // Afficher seulement si pas déjà affiché avec le même joueur
+    const currentText = ui.tText.textContent;
+    const newText = `TOUR DE ${player.name}`;
     
-    // Masquer automatiquement après 2 secondes pour ne pas gêner le jeu
-    setTimeout(() => {
-      if (ui.tBanner && ui.tBanner.style.display === 'flex') {
-        ui.tBanner.style.opacity = '0.7';
-        setTimeout(() => {
-          if (ui.tBanner) {
-            ui.tBanner.style.display = 'none';
-          }
-        }, 300);
-      }
-    }, 2000);
+    if (ui.tBanner.style.display === 'none' || currentText !== newText) {
+      ui.tBanner.style.display = 'flex';
+      ui.tBanner.style.opacity = '1';
+      ui.tText.textContent = newText;
+      ui.tBall.className = `turn-ball ${player.color}`;
+      
+      // Masquer automatiquement après 2 secondes pour ne pas gêner le jeu
+      turnIndicatorTimeout = setTimeout(() => {
+        if (ui.tBanner && ui.tBanner.style.display === 'flex') {
+          ui.tBanner.style.opacity = '0.7';
+          setTimeout(() => {
+            if (ui.tBanner) {
+              ui.tBanner.style.display = 'none';
+            }
+          }, 300);
+        }
+      }, 2000);
+    }
   }
 }
 

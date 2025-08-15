@@ -394,6 +394,8 @@ canvas{
   text-transform:uppercase;
   box-shadow:var(--glow) var(--neon-cyan);
   animation:fadeInDown 0.5s ease;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  will-change: opacity, transform;
 }
 
 @keyframes fadeInDown {

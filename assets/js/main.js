@@ -18,6 +18,7 @@ let players = [
   {id: 0, name: 'Player 1', color: 'white', assist: true, wins: 0, shots: 0, streak: 0},
   {id: 1, name: 'Player 2', color: 'black', assist: true, wins: 0, shots: 0, streak: 0}
 ];
+let lastDisplayedTurn = -1;
 
 // Variables d'animation
 let animationId = null;
@@ -262,6 +263,7 @@ function startGame() {
   // Afficher l'interface de jeu
   toggleGameView(true);
   updateScores(players);
+  lastDisplayedTurn = -1; // Forcer l'affichage du premier tour
   updateTurnIndicator(players[gameState.currentTurn], false);
   
   // Démarrer la partie
@@ -282,8 +284,11 @@ function gameLoop(currentTime) {
   // Mettre à jour la physique
   updatePhysics(deltaTime);
   
-  // Mettre à jour l'UI
-  updateTurnIndicator(players[gameState.currentTurn], gameState.isShot);
+  // Mettre à jour l'UI seulement si le tour a changé et pas en train de drag
+  if (!gameState.dragging && gameState.currentTurn !== lastDisplayedTurn) {
+    updateTurnIndicator(players[gameState.currentTurn], gameState.isShot);
+    lastDisplayedTurn = gameState.currentTurn;
+  }
   
   // Vérifier si l'IA doit jouer
   if (gameMode === GAME_MODE.AI && aiPlayer.shouldPlay()) {
