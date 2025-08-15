@@ -82,7 +82,9 @@ export const translations = {
     aiGoodShot: "BON TIR!",
     aiPerfectCalc: "CALCUL PARFAIT!",
     aiTactical: "TIR TACTIQUE!",
-    aiUsingPlayerBall: "UTILISE TA BOULE!"
+    aiUsingPlayerBall: "UTILISE TA BOULE!",
+    aiOneShot: "💀 ONE-SHOT PARFAIT! 💀",
+    aiTerminatorMode: "🤖 MODE TERMINATOR ACTIVÉ!"
   },
   
   nl: {
@@ -173,7 +175,9 @@ export const translations = {
     aiGoodShot: "GOED SCHOT!",
     aiPerfectCalc: "PERFECTE BEREKENING!",
     aiTactical: "TACTISCH SCHOT!",
-    aiUsingPlayerBall: "GEBRUIKT JOUW BAL!"
+    aiUsingPlayerBall: "GEBRUIKT JOUW BAL!",
+    aiOneShot: "💀 PERFECTE ONE-SHOT! 💀",
+    aiTerminatorMode: "🤖 TERMINATOR MODUS ACTIEF!"
   }
 };
 

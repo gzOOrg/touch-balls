@@ -7,6 +7,7 @@ import { length, normalize, distance, dotProduct } from './utils.js';
 import { gameState } from './game.js';
 import { showComboText } from './ui.js';
 import { t } from './translations.js';
+import { sfx } from './sfx.js';
 
 /**
  * Configuration par niveau d'IA
@@ -30,14 +31,16 @@ const AI_CONFIG = {
   },
   [AI_LEVEL.TERMINATOR]: {
     name: 'TERMINATOR',
-    angleStep: 5,       // Angles testés tous les 5° (très précis)
-    powerStep: 0.05,    // 20 niveaux de puissance (ultra précis)
+    angleStep: 2,       // Angles testés tous les 2° (ULTRA précis)
+    powerStep: 0.025,   // 40 niveaux de puissance (précision extrême)
     randomness: 0,      // Aucun aléatoire
-    thinkingTime: 2500, // Réflexion optimisée
+    thinkingTime: 3000, // Réflexion approfondie
     accuracy: 1.0,      // Précision parfaite
-    maxSimSteps: 500,   // Simulation profonde
-    wallBounces: 3,     // Peut calculer jusqu'à 3 rebonds
-    comboThreshold: 700 // Score minimum pour un combo
+    maxSimSteps: 1000,  // Simulation très profonde
+    wallBounces: 5,     // Peut calculer jusqu'à 5 rebonds
+    comboThreshold: 700,// Score minimum pour un combo
+    oneShotBonus: 2000, // Bonus énorme pour les one-shots
+    perfectShotRange: 0.95 // Recherche de tirs parfaits
   }
 };
 
@@ -69,13 +72,17 @@ export class AI {
     
     // Message de réflexion selon le niveau
     if (this.level === AI_LEVEL.TERMINATOR) {
-      showComboText(t('aiAnalyzing'));
+      // Introduction dramatique pour TERMINATOR
+      showComboText(t('aiTerminatorMode'));
+      setTimeout(() => {
+        if (this.isThinking) showComboText(t('aiAnalyzing'));
+      }, 500);
       setTimeout(() => {
         if (this.isThinking) showComboText(t('aiCalculating'));
-      }, 800);
+      }, 1200);
       setTimeout(() => {
         if (this.isThinking) showComboText(t('aiOptimizing'));
-      }, 1600);
+      }, 2000);
     } else {
       showComboText(`${this.config.name} ${t('aiThinking')}`);
     }
@@ -141,14 +148,29 @@ export class AI {
     
     let bestShot = null;
     let bestScore = -Infinity;
+    let shotsEvaluated = 0;
+    
+    // Pour TERMINATOR, d'abord chercher des one-shots parfaits
+    if (this.level === AI_LEVEL.TERMINATOR && gameState.redBall && gameState.redBall.isActive) {
+      const oneShotAttempts = this.findPerfectOneShot(playableBalls);
+      if (oneShotAttempts) {
+        console.log('🎯 TERMINATOR: One-shot parfait trouvé!');
+        return oneShotAttempts;
+      }
+    }
     
     // Tester toutes les boules disponibles
     for (const ball of playableBalls) {
       // Tester différents angles
       for (let angle = 0; angle < 360; angle += this.config.angleStep) {
-        // Tester différentes puissances
-        for (let power = 0.3; power <= 1; power += this.config.powerStep) {
+        // Pour TERMINATOR, tester plus de puissances autour des valeurs optimales
+        const powerRange = this.level === AI_LEVEL.TERMINATOR ? 
+          [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.98, 1.0] : 
+          this.getPowerRange();
+          
+        for (const power of powerRange) {
           const score = this.evaluateShot(ball, angle * Math.PI / 180, power);
+          shotsEvaluated++;
           
           if (score > bestScore) {
             bestScore = score;
@@ -163,7 +185,109 @@ export class AI {
       }
     }
     
+    if (this.level === AI_LEVEL.TERMINATOR) {
+      console.log(`🤖 TERMINATOR: ${shotsEvaluated} tirs évalués, meilleur score: ${Math.round(bestScore)}`);
+    }
+    
     return bestShot;
+  }
+  
+  /**
+   * Obtient la gamme de puissances à tester selon le niveau
+   */
+  getPowerRange() {
+    const range = [];
+    for (let power = 0.3; power <= 1; power += this.config.powerStep) {
+      range.push(power);
+    }
+    return range;
+  }
+  
+  /**
+   * Cherche un one-shot parfait pour TERMINATOR
+   */
+  findPerfectOneShot(playableBalls) {
+    const redBall = gameState.redBall;
+    if (!redBall || !redBall.isActive) return null;
+    
+    const holeX = CANVAS_WIDTH / 2;
+    const holeY = CANVAS_HEIGHT / 2;
+    let bestOneShot = null;
+    let bestOneShotScore = 0;
+    
+    // Pour chaque boule jouable
+    for (const ball of playableBalls) {
+      // 1. Tir direct sur la rouge
+      const toRedAngle = Math.atan2(redBall.y - ball.y, redBall.x - ball.x);
+      const redToHoleAngle = Math.atan2(holeY - redBall.y, holeX - redBall.x);
+      let angleDiff = Math.abs(toRedAngle - redToHoleAngle);
+      // Normaliser l'angle entre 0 et PI
+      if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+      
+      if (angleDiff < Math.PI / 4) { // Alignement proche (45 degrés)
+        // Tester plusieurs puissances pour un one-shot direct
+        for (let power = 0.5; power <= 1; power += 0.05) {
+          const vx = Math.cos(toRedAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(toRedAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simResult = this.simulateFullShot(ball, vx, vy);
+          
+          // Vérifier si c'est un one-shot
+          const redInHoleEvent = simResult.events.find(e => e.type === 'redInHole');
+          if (redInHoleEvent && redInHoleEvent.step < 200) {
+            const shotScore = simResult.score + this.config.oneShotBonus;
+            if (shotScore > bestOneShotScore) {
+              bestOneShotScore = shotScore;
+              bestOneShot = {
+                ball,
+                angle: toRedAngle,
+                power,
+                score: shotScore
+              };
+            }
+          }
+        }
+      }
+      
+      // 2. Tirs avec rebonds calculés (pour TERMINATOR uniquement)
+      // Tester des angles variés pour des rebonds
+      for (let angle = 0; angle < 360; angle += 15) {
+        const testAngle = angle * Math.PI / 180;
+        
+        // Simuler pour voir si on peut toucher la rouge après rebond
+        for (let power = 0.7; power <= 1; power += 0.1) {
+          const vx = Math.cos(testAngle) * power * POWER_MULTIPLIER * 100;
+          const vy = Math.sin(testAngle) * power * POWER_MULTIPLIER * 100;
+          
+          const simResult = this.simulateFullShot(ball, vx, vy);
+          
+          // Vérifier si on touche la rouge et qu'elle tombe dans le trou
+          const hitRedEvent = simResult.events.find(e => e.type === 'hitRed');
+          const redInHoleEvent = simResult.events.find(e => e.type === 'redInHole');
+          
+          if (hitRedEvent && redInHoleEvent && redInHoleEvent.step < 300) {
+            const shotScore = simResult.score + this.config.oneShotBonus / 2; // Moins de bonus pour les rebonds
+            if (shotScore > bestOneShotScore) {
+              bestOneShotScore = shotScore;
+              bestOneShot = {
+                ball,
+                angle: testAngle,
+                power,
+                score: shotScore
+              };
+            }
+          }
+        }
+      }
+    }
+    
+    // Ne retourner que si on a trouvé un très bon one-shot
+    if (bestOneShot && bestOneShotScore > 3000) {
+      console.log('💀 TERMINATOR: One-shot calculé avec score:', Math.round(bestOneShotScore));
+      return bestOneShot;
+    }
+    
+    return null;
   }
   
   /**
@@ -185,7 +309,15 @@ export class AI {
     // Pour TERMINATOR, utiliser la simulation avancée
     if (this.level === AI_LEVEL.TERMINATOR) {
       const simResult = this.simulateFullShot(ball, vx, vy);
-      return simResult.score + (ball.owner === 0 ? 100 : 0); // Bonus supplémentaire pour TERMINATOR
+      let finalScore = simResult.score + (ball.owner === 0 ? 100 : 0); // Bonus supplémentaire pour TERMINATOR
+      
+      // Analyse spéciale pour les one-shots directs sur la rouge
+      if (simResult.events.some(e => e.type === 'redInHole' && e.step < 100)) {
+        finalScore += this.config.oneShotBonus; // Bonus énorme pour un one-shot
+        console.log('🎯 TERMINATOR: One-shot potentiel détecté!');
+      }
+      
+      return finalScore;
     }
     
     // 1. Évaluer le tir sur la boule rouge (priorité maximale)
@@ -437,6 +569,15 @@ export class AI {
           if (simBall.isRed) {
             simulation.events.push({ type: 'redInHole', step });
             simulation.score += 1000; // Victoire !
+            
+            // Bonus supplémentaire pour les one-shots rapides
+            if (step < 50) {
+              simulation.score += 2000; // One-shot ultra rapide
+            } else if (step < 100) {
+              simulation.score += 1000; // One-shot rapide
+            } else if (step < 200) {
+              simulation.score += 500; // One-shot normal
+            }
           } else if (simBall.owner === 0) {
             simulation.events.push({ type: 'enemyInHole', step });
             simulation.score += 400;
@@ -521,11 +662,19 @@ export class AI {
     gameState.aiAiming = null; // Effacer la visée de l'IA
     
     // Message selon le niveau et le score
-    if (ball.owner === 0) {
+    if (ball.owner === 0 && this.level === AI_LEVEL.TERMINATOR) {
+      // TERMINATOR utilise une boule du joueur pour un coup parfait
+      showComboText('🤖 ' + t('aiTactical'));
+    } else if (ball.owner === 0) {
       // L'IA utilise une boule du joueur
       showComboText(t('aiUsingPlayerBall'));
     } else if (this.level === AI_LEVEL.TERMINATOR) {
-      if (shot.score > this.config.comboThreshold) {
+      if (shot.score > 3000) {
+        showComboText(t('aiOneShot'));
+        // Effet sonore spécial pour les one-shots
+        setTimeout(() => sfx.epic(), 100);
+        setTimeout(() => sfx.victory(), 300);
+      } else if (shot.score > this.config.comboThreshold) {
         showComboText(t('aiQuantum'));
       } else if (shot.score > 500) {
         showComboText(t('aiComplete'));
