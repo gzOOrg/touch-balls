@@ -357,13 +357,30 @@ function setupNetworkCallbacks() {
     console.log('✅ État de jeu synchronisé avec succès');
   };
   
-  // Changement de tour
+  // Changement de tour (avec gestion des couleurs multijoueur)
   network.onTurnChange = (turn, isMyTurn) => {
     gameState.currentTurn = turn;
+    
+    // Mise à jour de l'indicateur de tour avec les bonnes couleurs
+    if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+      // En mode multijoueur : tour 0 = hébergeur (blanches), tour 1 = rejoignant (noires)
+      const currentPlayer = players[turn];
+      console.log(`🔄 Tour ${turn}: ${currentPlayer.name} (${currentPlayer.color || (turn === 0 ? 'blanches' : 'noires')})`);
+      
+      // Affichage spécial pour indiquer qui joue et avec quelles balles
+      if (network.isHost) {
+        const message = turn === 0 ? 'VOTRE TOUR (BLANCHES)' : `TOUR DE ${players[1].name} (NOIRES)`;
+        if (turn === 0) showComboText(message);
+      } else {
+        const message = turn === 1 ? 'VOTRE TOUR (NOIRES)' : `TOUR DE ${players[0].name} (BLANCHES)`;
+        if (turn === 1) showComboText(message);
+      }
+    }
+    
     updateTurnIndicator(players[turn], gameState.isShot);
   };
   
-  // Démarrage du jeu reçu
+  // Démarrage du jeu reçu (avec gestion des couleurs)
   network.onGameStart = (data) => {
     console.log('🎮 Démarrage du jeu reçu de l\'hôte!');
     
@@ -377,6 +394,13 @@ function setupNetworkCallbacks() {
     // Mettre à jour l'assistance
     players[0].assist = data.player1Assist !== undefined ? data.player1Assist : true;
     players[1].assist = data.player2Assist !== undefined ? data.player2Assist : true;
+    
+    // Configurer les couleurs côté rejoignant
+    if (data.hostHasWhiteBalls) {
+      players[0].color = 'white'; // L'hôte (joueur 0)
+      players[1].color = 'black'; // Le rejoignant (joueur 1)
+      console.log('🎯 Couleurs confirmées: Hôte=Blanches, Rejoignant=Noires');
+    }
     
     // Afficher un message de confirmation
     showAchievement('PARTIE DÉMARRÉE!');
@@ -515,6 +539,19 @@ function startGame() {
   
   // Si on est en mode multijoueur, synchroniser avec l'adversaire
   if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+    // Configurer les couleurs selon le rôle
+    if (gameMode === GAME_MODE.HOST) {
+      // L'hébergeur a les balles blanches (joueur 0)
+      players[0].color = 'white';
+      players[1].color = 'black';
+      showAchievement('VOUS JOUEZ AVEC LES BALLES BLANCHES!');
+    } else {
+      // Le rejoignant a les balles noires (joueur 1) 
+      players[0].color = 'white'; // L'hôte
+      players[1].color = 'black'; // Le rejoignant (vous)
+      showAchievement('VOUS JOUEZ AVEC LES BALLES NOIRES!');
+    }
+    
     // L'hôte envoie le signal de démarrage
     if (gameMode === GAME_MODE.HOST) {
       const gameData = {
@@ -522,7 +559,8 @@ function startGame() {
         player2Name: players[1].name,
         difficulty: difficulty,
         player1Assist: players[0].assist,
-        player2Assist: players[1].assist
+        player2Assist: players[1].assist,
+        hostHasWhiteBalls: true // Confirmation que l'hôte a les blanches
       };
       
       // Envoyer les noms et paramètres
@@ -530,7 +568,8 @@ function startGame() {
       network.sendGameSettings({
         difficulty: difficulty,
         player1Assist: players[0].assist,
-        player2Assist: players[1].assist
+        player2Assist: players[1].assist,
+        hostHasWhiteBalls: true
       });
       
       // Envoyer le signal de démarrage

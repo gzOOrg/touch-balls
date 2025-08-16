@@ -309,26 +309,49 @@ class Ball {
 }
 
 /**
- * Réinitialise les boules
+ * Réinitialise les boules avec attribution correcte selon le mode de jeu
  */
 export function resetBalls() {
   gameState.balls = [];
   const centerX = CANVAS_WIDTH / 2;
   const centerY = CANVAS_HEIGHT / 2;
   
-  // Boules blanches (joueur 1)
-  gameState.balls.push(
-    new Ball(centerX - 180, centerY - 40, BALL_COLORS.WHITE, 0),
-    new Ball(centerX - 180, centerY + 40, BALL_COLORS.WHITE, 0)
-  );
+  // Vérifier le mode de jeu pour déterminer l'attribution des couleurs
+  const gameMode = getGameMode ? getGameMode() : 'LOCAL';
   
-  // Boules noires (joueur 2)
-  gameState.balls.push(
-    new Ball(centerX + 180, centerY - 40, BALL_COLORS.BLACK, 1),
-    new Ball(centerX + 180, centerY + 40, BALL_COLORS.BLACK, 1)
-  );
+  if (gameMode === 'HOST' || gameMode === 'GUEST') {
+    // Mode multijoueur : hébergeur = blanches (0), rejoignant = noires (1)
+    const isHost = (gameMode === 'HOST');
+    
+    // Boules blanches - toujours pour l'hébergeur (joueur 0)
+    gameState.balls.push(
+      new Ball(centerX - 180, centerY - 40, BALL_COLORS.WHITE, 0),
+      new Ball(centerX - 180, centerY + 40, BALL_COLORS.WHITE, 0)
+    );
+    
+    // Boules noires - toujours pour le rejoignant (joueur 1)
+    gameState.balls.push(
+      new Ball(centerX + 180, centerY - 40, BALL_COLORS.BLACK, 1),
+      new Ball(centerX + 180, centerY + 40, BALL_COLORS.BLACK, 1)
+    );
+    
+    console.log(`🎮 Mode ${gameMode}: Hébergeur=Blanches(0), Rejoignant=Noires(1)`);
+  } else {
+    // Mode local/IA : attribution normale
+    // Boules blanches (joueur 1)
+    gameState.balls.push(
+      new Ball(centerX - 180, centerY - 40, BALL_COLORS.WHITE, 0),
+      new Ball(centerX - 180, centerY + 40, BALL_COLORS.WHITE, 0)
+    );
+    
+    // Boules noires (joueur 2)
+    gameState.balls.push(
+      new Ball(centerX + 180, centerY - 40, BALL_COLORS.BLACK, 1),
+      new Ball(centerX + 180, centerY + 40, BALL_COLORS.BLACK, 1)
+    );
+  }
   
-  // Boule rouge
+  // Boule rouge (neutre)
   const yBottom = CANVAS_HEIGHT - BALL_RADIUS;
   const yMid = centerY + (yBottom - centerY) / 2;
   gameState.redBall = new Ball(centerX, yMid, BALL_COLORS.RED, null);
