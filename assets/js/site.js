@@ -913,6 +913,9 @@ function setLanguage(lang) {
   translatePage(lang);
 }
 
+// Rendre setLanguage accessible globalement pour la synchronisation avec le jeu
+window.setLanguage = setLanguage;
+
 /**
  * Traduire la page
  */

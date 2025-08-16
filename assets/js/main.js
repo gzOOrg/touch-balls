@@ -1151,6 +1151,11 @@ function initializeEvents() {
       localStorage.setItem('billardLanguage', newLang);
       updateUITexts();
       
+      // Mettre à jour aussi les traductions de site.js si disponibles
+      if (typeof window.setLanguage === 'function') {
+        window.setLanguage(newLang);
+      }
+      
       // Mettre à jour l'état actif des boutons
       langButtons.forEach(b => {
         if (b.dataset.lang === newLang) {
