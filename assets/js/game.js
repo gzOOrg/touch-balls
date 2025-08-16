@@ -135,8 +135,17 @@ class Ball {
     this.trail = this.trail.filter(point => point.alpha > 0);
     
     // Appliquer la vélocité
+    const oldX = this.x;
+    const oldY = this.y;
+    const hadVelocity = (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1);
+    
     this.x += this.vx * dt;
     this.y += this.vy * dt;
+    
+    // Log pour debug si la balle bouge
+    if (hadVelocity && (Math.abs(this.x - oldX) > 0.1 || Math.abs(this.y - oldY) > 0.1)) {
+      console.log(`🚀 Balle ${this.id.toFixed(3)} bouge: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) → (${this.x.toFixed(1)}, ${this.y.toFixed(1)}), v=(${this.vx.toFixed(1)}, ${this.vy.toFixed(1)})`);
+    }
     
     // Friction
     const speed = length(this.vx, this.vy);
@@ -1006,6 +1015,9 @@ function handlePointerDown(x, y) {
     
     const dist = distance(x, y, ball.x, ball.y);
     if (dist < ball.radius + 10) {
+      console.log(`✅ BALLE CLIQUÉE! ID: ${ball.id}, owner: ${ball.owner}, color: ${ball.color}`);
+      console.log(`   Position: (${ball.x}, ${ball.y}), Distance du clic: ${dist.toFixed(1)}`);
+      
       ballClicked = true;
       gameState.dragging = true;
       gameState.draggedBall = ball;
@@ -1013,6 +1025,8 @@ function handlePointerDown(x, y) {
       canvas.style.cursor = 'grabbing';
       updateTurnIndicator(null, true); // Cacher l'indicateur de tour
       showPowerMeter(true, 0);
+      
+      console.log(`🎮 DRAG DÉMARRÉ: dragging=${gameState.dragging}, draggedBall ID=${gameState.draggedBall.id}`);
     }
   });
   
@@ -1115,8 +1129,11 @@ function handleTouchEnd(e) {
 }
 
 function handlePointerUp() {
+  console.log(`🖱️ POINTER UP: dragging=${gameState.dragging}, draggedBall=${gameState.draggedBall?.id}`);
+  
   if (gameState.dragging && gameState.draggedBall) {
     const dist = length(gameState.drag.x, gameState.drag.y);
+    console.log(`📏 Distance de drag: ${dist.toFixed(1)} (minimum: 10)`);
     
     if (dist > 10) {
       // Calculer la puissance basée sur la distance de drag
@@ -1126,8 +1143,18 @@ function handlePointerUp() {
       // (on tire vers l'arrière pour propulser vers l'avant)
       const normalized = normalize(-gameState.drag.x, -gameState.drag.y);
       
-      gameState.draggedBall.vx = normalized.x * power * POWER_MULTIPLIER * 100;
-      gameState.draggedBall.vy = normalized.y * power * POWER_MULTIPLIER * 100;
+      const vx = normalized.x * power * POWER_MULTIPLIER * 100;
+      const vy = normalized.y * power * POWER_MULTIPLIER * 100;
+      
+      gameState.draggedBall.vx = vx;
+      gameState.draggedBall.vy = vy;
+      
+      console.log(`⚡ VÉLOCITÉ APPLIQUÉE LOCALEMENT:`);
+      console.log(`   Balle ID: ${gameState.draggedBall.id}`);
+      console.log(`   Position: (${gameState.draggedBall.x}, ${gameState.draggedBall.y})`);
+      console.log(`   Vélocité: vx=${vx}, vy=${vy}`);
+      console.log(`   Power: ${power}, Normalized: (${normalized.x}, ${normalized.y})`);
+      console.log(`   IsShot sera: true`);
       
       gameState.isShot = true;
       gameState.fallenBalls = [];
