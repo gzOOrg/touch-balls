@@ -851,7 +851,22 @@ const siteTranslations = {
     'footer-source': 'ソースコード',
     'footer-contact': 'お問い合わせ',
     'footer-languages': 'サポート言語',
-    'footer-copyright': '© 2024 Epic Billiards. ❤️とたくさんの☕で作られました'
+    'footer-copyright': '© 2024 Epic Billiards. ❤️とたくさんの☕で作られました',
+    
+    // Host mode
+    'gamePartyId': 'あなたのゲームID',
+    'copyId': 'IDをコピー',
+    'shareId': 'このIDを対戦相手と共有してください！',
+    
+    // Join mode
+    'opponentId': '対戦相手のゲームID',
+    'pasteIdHere': 'ここにIDを貼り付け...',
+    'connect': '接続',
+    'cancel': 'キャンセル',
+    
+    // Status
+    'disconnected': '切断されました',
+    'generating': '生成中...'
   }
 };
 
