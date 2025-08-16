@@ -317,11 +317,11 @@ export function resetBalls() {
   const centerY = CANVAS_HEIGHT / 2;
   
   // Vérifier le mode de jeu pour déterminer l'attribution des couleurs
-  const gameMode = getGameMode ? getGameMode() : 'LOCAL';
+  const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
   
-  if (gameMode === 'HOST' || gameMode === 'GUEST') {
+  if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
     // Mode multijoueur : hébergeur = blanches (0), rejoignant = noires (1)
-    const isHost = (gameMode === 'HOST');
+    const isHost = (gameMode === GAME_MODE.HOST);
     
     // Boules blanches - toujours pour l'hébergeur (joueur 0)
     gameState.balls.push(
@@ -972,7 +972,27 @@ function handlePointerDown(x, y) {
   let ballClicked = false;
   gameState.balls.forEach(ball => {
     // Ne pas permettre de déplacer la boule rouge ou les boules inactives
-    if (!ball.isActive || ball === gameState.redBall || ball.owner !== gameState.currentTurn) return;
+    if (!ball.isActive || ball === gameState.redBall) return;
+    
+    // Vérifier si c'est le bon joueur selon le mode de jeu
+    const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+    let canPlayThisBall = false;
+    
+    if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+      // Mode multijoueur : vérifier selon le rôle réseau
+      if (gameMode === GAME_MODE.HOST) {
+        // L'hébergeur ne peut jouer que quand c'est le tour 0 (ses balles blanches)
+        canPlayThisBall = (gameState.currentTurn === 0 && ball.owner === 0);
+      } else {
+        // Le rejoignant ne peut jouer que quand c'est le tour 1 (ses balles noires)
+        canPlayThisBall = (gameState.currentTurn === 1 && ball.owner === 1);
+      }
+    } else {
+      // Mode local/IA : attribution classique
+      canPlayThisBall = (ball.owner === gameState.currentTurn);
+    }
+    
+    if (!canPlayThisBall) return;
     
     const dist = distance(x, y, ball.x, ball.y);
     if (dist < ball.radius + 10) {
@@ -1043,7 +1063,27 @@ function handlePointerMove(x, y) {
     let hoveringBall = false;
     gameState.balls.forEach(ball => {
       // Ne pas permettre de survoler la boule rouge ou les boules inactives
-      if (!ball.isActive || ball === gameState.redBall || ball.owner !== gameState.currentTurn) return;
+      if (!ball.isActive || ball === gameState.redBall) return;
+      
+      // Vérifier si c'est le bon joueur selon le mode de jeu
+      const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+      let canPlayThisBall = false;
+      
+      if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+        // Mode multijoueur : vérifier selon le rôle réseau
+        if (gameMode === GAME_MODE.HOST) {
+          // L'hébergeur ne peut jouer que quand c'est le tour 0 (ses balles blanches)
+          canPlayThisBall = (gameState.currentTurn === 0 && ball.owner === 0);
+        } else {
+          // Le rejoignant ne peut jouer que quand c'est le tour 1 (ses balles noires)
+          canPlayThisBall = (gameState.currentTurn === 1 && ball.owner === 1);
+        }
+      } else {
+        // Mode local/IA : attribution classique
+        canPlayThisBall = (ball.owner === gameState.currentTurn);
+      }
+      
+      if (!canPlayThisBall) return;
       
       const d = distance(x, y, ball.x, ball.y);
       if (d < ball.radius + 10) {
@@ -1126,6 +1166,20 @@ export function startMatch() {
   gameState.matchOver = false;
   gameState.roundOver = false;
   gameState.roundWinner = null;
+  
+  // Déterminer qui commence selon le mode de jeu
+  const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+  
+  if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+    // En mode multijoueur : l'hébergeur (player 0) commence toujours
+    gameState.currentTurn = 0;
+    console.log('🎯 Mode multijoueur: L\'hébergeur (player 0 - blanches) commence');
+  } else {
+    // Mode local/IA : choix aléatoire
+    gameState.currentTurn = Math.random() < 0.5 ? 0 : 1;
+    console.log(`🎯 Mode ${gameMode}: Player ${gameState.currentTurn} commence`);
+  }
+  
   resetBalls();
 }
 
