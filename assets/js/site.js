@@ -926,6 +926,24 @@ function translatePage(lang) {
   
   console.log(`✅ ${translatedCount} éléments traduits en ${lang.toUpperCase()}`);
   
+  // Traduire les placeholders
+  const placeholderElements = document.querySelectorAll('[data-translate-placeholder]');
+  console.log(`📝 ${placeholderElements.length} placeholders trouvés`);
+  
+  let placeholderCount = 0;
+  placeholderElements.forEach(element => {
+    const key = element.getAttribute('data-translate-placeholder');
+    if (translations[key]) {
+      element.placeholder = translations[key];
+      placeholderCount++;
+      console.log(`🔄 Placeholder ${key}: → "${translations[key]}"`);
+    } else {
+      console.warn(`⚠️ Clé placeholder manquante: ${key} pour la langue ${lang}`);
+    }
+  });
+  
+  console.log(`✅ ${placeholderCount} placeholders traduits`);
+  
   // Notify game that language has changed (if game is loaded in another tab/frame)
   try {
     if (window.parent && window.parent !== window) {
