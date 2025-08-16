@@ -6,7 +6,7 @@ import { ui, initializeUI, showAchievement, updateStatus, toggleGameView, update
 import { sfx } from './sfx.js';
 import { GAME_MODE, DIFFICULTY, AI_LEVEL } from './constants.js';
 import { copyToClipboard } from './utils.js';
-import { initGame, render, updatePhysics, startMatch, setDifficulty, gameState, setGameModeGetter, setPlayersGetter, setNetworkCallbacks } from './game.js';
+import { initGame, render, updatePhysics, startMatch, setDifficulty, gameState, setGameModeGetter, setPlayersGetter, setNetworkCallbacks, Ball } from './game.js';
 import { aiPlayer } from './ai.js';
 import { network } from './network.js';
 import { t, setLanguage, getLanguage } from './translations.js';
@@ -337,54 +337,17 @@ function setupNetworkCallbacks() {
     // Synchroniser les boules avec plus de précision
     if (data.balls && Array.isArray(data.balls)) {
       gameState.balls = data.balls.map(ballData => {
-        // Créer une nouvelle balle avec les propriétés appropriées
-        const ball = {
-          ...ballData,
-          trail: ballData.trail || [],
-          draw: function() {
-            // Méthode draw simplifiée pour les balles synchronisées
-            if (!this.isActive) return;
-            
-            const canvas = document.getElementById('game-canvas');
-            const ctx = canvas.getContext('2d');
-            const grad = ctx.createRadialGradient(
-              this.x - this.radius * 0.3, 
-              this.y - this.radius * 0.3, 
-              1, 
-              this.x, 
-              this.y, 
-              this.radius
-            );
-            
-            if (this.color === 'white') {
-              grad.addColorStop(0, '#ffffff');
-              grad.addColorStop(0.7, '#e0e0e0');
-              grad.addColorStop(1, '#c0c0c0');
-            } else if (this.color === '#111827' || this.color === 'black') {
-              grad.addColorStop(0, '#4a4a4a');
-              grad.addColorStop(0.7, '#2a2a2a');
-              grad.addColorStop(1, '#111827');
-            } else {
-              grad.addColorStop(0, '#ff6b9d');
-              grad.addColorStop(0.7, '#e11d48');
-              grad.addColorStop(1, '#be185d');
-            }
-            
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fill();
-          },
-          update: function(dt) {
-            if (!this.isActive) return;
-            if (!this.trail) this.trail = [];
-            // Mise à jour simplifiée pour éviter les erreurs
-            this.x += this.vx * dt;
-            this.y += this.vy * dt;
-            this.vx *= 0.985;
-            this.vy *= 0.985;
-          }
-        };
+        // Créer une vraie instance Ball avec les données synchronisées
+        const ball = new Ball(ballData.x, ballData.y, ballData.color, ballData.owner);
+        
+        // Copier toutes les propriétés importantes
+        ball.id = ballData.id;
+        ball.vx = ballData.vx;
+        ball.vy = ballData.vy;
+        ball.isActive = ballData.isActive;
+        ball.radius = ballData.radius;
+        ball.trail = ballData.trail || [];
+        
         return ball;
       });
       console.log('🔄 Balles synchronisées:', gameState.balls.length);

@@ -105,7 +105,7 @@ export function initGame(canvasElement) {
 /**
  * Classe Ball - Représente une boule
  */
-class Ball {
+export class Ball {
   constructor(x, y, color, owner = null) {
     this.id = Math.random();
     this.x = x;
