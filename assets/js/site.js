@@ -471,7 +471,12 @@ const siteTranslations = {
     'footer-source': 'Code Source',
     'footer-contact': 'Contact',
     'footer-languages': 'Langues Supportées',
-    'footer-copyright': '© 2024 Epic Billiards. Fait avec ❤️ et beaucoup de ☕'
+    'footer-copyright': '© 2024 Epic Billiards. Fait avec ❤️ et beaucoup de ☕',
+    
+    // Mode héberger
+    'gamePartyId': 'TON ID DE PARTIE',
+    'copyId': 'COPIER ID',
+    'shareId': 'Partage cet ID à ton adversaire !'
   },
   
   en: {
@@ -541,7 +546,12 @@ const siteTranslations = {
     'footer-source': 'Source Code',
     'footer-contact': 'Contact',
     'footer-languages': 'Supported Languages',
-    'footer-copyright': '© 2024 Epic Billiards. Made with ❤️ and lots of ☕'
+    'footer-copyright': '© 2024 Epic Billiards. Made with ❤️ and lots of ☕',
+    
+    // Host mode
+    'gamePartyId': 'YOUR GAME ID',
+    'copyId': 'COPY ID',
+    'shareId': 'Share this ID with your opponent!'
   },
   
   de: {
