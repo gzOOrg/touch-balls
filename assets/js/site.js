@@ -711,7 +711,22 @@ const siteTranslations = {
     'footer-source': 'Broncode',
     'footer-contact': 'Contact',
     'footer-languages': 'Ondersteunde Talen',
-    'footer-copyright': '© 2024 Epic Billiards. Gemaakt met ❤️ en veel ☕'
+    'footer-copyright': '© 2024 Epic Billiards. Gemaakt met ❤️ en veel ☕',
+    
+    // Host mode
+    'gamePartyId': 'JOUW SPEL ID',
+    'copyId': 'ID KOPIËREN',
+    'shareId': 'Deel dit ID met je tegenstander!',
+    
+    // Join mode
+    'opponentId': 'TEGENSTANDER SPEL ID',
+    'pasteIdHere': 'Plak ID hier...',
+    'connect': 'VERBINDEN',
+    'cancel': 'ANNULEREN',
+    
+    // Status
+    'disconnected': 'Verbinding verbroken',
+    'generating': 'Genereren...'
   },
   
   zh: {

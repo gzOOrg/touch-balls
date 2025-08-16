@@ -183,7 +183,15 @@ export const translations = {
     aiTactical: "TACTISCH SCHOT!",
     aiUsingPlayerBall: "GEBRUIKT JOUW BAL!",
     aiOneShot: "💀 PERFECTE ONE-SHOT! 💀",
-    aiTerminatorMode: "🤖 TERMINATOR MODUS ACTIEF!"
+    aiTerminatorMode: "🤖 TERMINATOR MODUS ACTIEF!",
+    
+    // Multijoueur
+    waitingForPlayer: "Wachten op tegenstander...",
+    readyToConnect: "Klaar om te verbinden...",
+    gamePartyId: "JOUW SPEL ID",
+    shareId: "Deel dit ID met je tegenstander!",
+    generating: "Genereren...",
+    disconnected: "Verbinding verbroken"
   },
 
   en: {
