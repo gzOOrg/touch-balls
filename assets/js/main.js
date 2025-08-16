@@ -312,7 +312,7 @@ function setupNetworkCallbacks() {
         if (!isMyShot) {
           // C'est le tir de l'adversaire - compter les stats
           gameState.totalShots++;
-          updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
+          // updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime); // Commenté temporairement
           console.log('✅ Tir adversaire appliqué et comptabilisé');
         } else {
           console.log('✅ Echo de mon propre tir appliqué (sécurité)');
@@ -337,10 +337,57 @@ function setupNetworkCallbacks() {
     // Synchroniser les boules avec plus de précision
     if (data.balls && Array.isArray(data.balls)) {
       gameState.balls = data.balls.map(ballData => {
-        const ball = Object.create(gameState.balls[0].__proto__); // Copier le prototype
-        Object.assign(ball, ballData);
+        // Créer une nouvelle balle avec les propriétés appropriées
+        const ball = {
+          ...ballData,
+          trail: ballData.trail || [],
+          draw: function() {
+            // Méthode draw simplifiée pour les balles synchronisées
+            if (!this.isActive) return;
+            
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            const grad = ctx.createRadialGradient(
+              this.x - this.radius * 0.3, 
+              this.y - this.radius * 0.3, 
+              1, 
+              this.x, 
+              this.y, 
+              this.radius
+            );
+            
+            if (this.color === 'white') {
+              grad.addColorStop(0, '#ffffff');
+              grad.addColorStop(0.7, '#e0e0e0');
+              grad.addColorStop(1, '#c0c0c0');
+            } else if (this.color === '#111827' || this.color === 'black') {
+              grad.addColorStop(0, '#4a4a4a');
+              grad.addColorStop(0.7, '#2a2a2a');
+              grad.addColorStop(1, '#111827');
+            } else {
+              grad.addColorStop(0, '#ff6b9d');
+              grad.addColorStop(0.7, '#e11d48');
+              grad.addColorStop(1, '#be185d');
+            }
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+          },
+          update: function(dt) {
+            if (!this.isActive) return;
+            if (!this.trail) this.trail = [];
+            // Mise à jour simplifiée pour éviter les erreurs
+            this.x += this.vx * dt;
+            this.y += this.vy * dt;
+            this.vx *= 0.985;
+            this.vy *= 0.985;
+          }
+        };
         return ball;
       });
+      console.log('🔄 Balles synchronisées:', gameState.balls.length);
     }
     
     // Synchroniser tous les états de jeu
@@ -382,11 +429,11 @@ function setupNetworkCallbacks() {
       // Affichage spécial pour indiquer qui joue et avec quelles balles
       if (network.isHost) {
         const message = turn === 0 ? 'VOTRE TOUR (BLANCHES)' : `TOUR DE ${players[1].name} (NOIRES)`;
-        if (turn === 0) showComboText(message);
+        if (turn === 0) console.log('💬 HOST:', message); // showComboText(message); - commenté temporairement
         console.log(`🎯 HOST - ${message}`);
       } else {
         const message = turn === 1 ? 'VOTRE TOUR (NOIRES)' : `TOUR DE ${players[0].name} (BLANCHES)`;
-        if (turn === 1) showComboText(message);
+        if (turn === 1) console.log('💬 GUEST:', message); // showComboText(message); - commenté temporairement
         console.log(`🎯 GUEST - ${message}`);
       }
     }
@@ -502,6 +549,12 @@ function setupNetworkCallbacks() {
         ball.vx = 0;
         ball.vy = 0;
         ball.isActive = pos.isActive;
+        
+        // S'assurer que trail existe toujours
+        if (!ball.trail) {
+          ball.trail = [];
+          console.log(`🔧 Trail réinitialisé pour balle ${pos.id.toFixed(3)}`);
+        }
         
         console.log(`   Balle ${pos.id.toFixed(3)}: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) → (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) active=${pos.isActive}`);
       } else {
@@ -1145,10 +1198,14 @@ function initializeEvents() {
       });
       
       // Animation de feedback
-      e.currentTarget.style.animation = 'pulse 0.5s ease';
-      setTimeout(() => {
-        e.currentTarget.style.animation = '';
-      }, 500);
+      if (e.currentTarget && e.currentTarget.style) {
+        e.currentTarget.style.animation = 'pulse 0.5s ease';
+        setTimeout(() => {
+          if (e.currentTarget && e.currentTarget.style) {
+            e.currentTarget.style.animation = '';
+          }
+        }, 500);
+      }
       
       // Son de clic
       const ctx = new AudioContext();
