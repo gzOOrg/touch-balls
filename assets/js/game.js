@@ -536,16 +536,46 @@ function checkRoundEnd() {
   }
   
   if (!gameState.roundOver) {
-    // Changer de tour
-    gameState.currentTurn = 1 - gameState.currentTurn;
+    // En mode multijoueur, changer de tour seulement si certaines conditions sont remplies
+    const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+    let shouldChangeTurn = false;
+    
+    if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+      // En multijoueur : changer de tour uniquement si :
+      // 1. Aucune balle n'est tombée dans le trou central
+      // 2. Ou si c'est une faute (balle rouge touchée en premier, etc.)
+      const ballsInHole = gameState.fallenBalls.length;
+      
+      if (ballsInHole === 0) {
+        // Aucune balle dans le trou = fin du tour
+        shouldChangeTurn = true;
+        console.log('🔄 Changement de tour: Aucune balle empochée');
+      } else {
+        // Des balles sont tombées, le joueur continue
+        console.log('🎯 Le joueur continue: ' + ballsInHole + ' balle(s) empochée(s)');
+        shouldChangeTurn = false;
+      }
+    } else {
+      // Mode local/IA : comportement original (changement systématique)
+      shouldChangeTurn = true;
+    }
+    
+    if (shouldChangeTurn) {
+      gameState.currentTurn = 1 - gameState.currentTurn;
+      console.log(`🔄 Tour changé vers joueur ${gameState.currentTurn}`);
+      
+      // Envoyer le changement de tour en réseau si nécessaire
+      if (onTurnChange && (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST)) {
+        onTurnChange(gameState.currentTurn);
+      }
+    }
+    
     gameState.totalShots++;
     gameState.aiAiming = null; // Effacer la visée de l'IA
-    updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
+    // updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime); // Commenté temporairement
     
-    // Envoyer le changement de tour en réseau si nécessaire
-    if (onTurnChange && getGameMode && (getGameMode() === GAME_MODE.HOST || getGameMode() === GAME_MODE.GUEST)) {
-      onTurnChange(gameState.currentTurn);
-    }
+    // Réinitialiser les balles tombées après le traitement du tour
+    gameState.fallenBalls = [];
   } else {
     // La manche est terminée, gérer la fin
     gameState.aiAiming = null; // Effacer la visée de l'IA
@@ -1201,7 +1231,7 @@ function handlePointerUp() {
       console.log(`   IsShot sera: true`);
       
       gameState.isShot = true;
-      gameState.fallenBalls = [];
+      // NE PAS réinitialiser fallenBalls ici - sera fait après checkRoundEnd()
       gameState.totalShots++;
       
       updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);

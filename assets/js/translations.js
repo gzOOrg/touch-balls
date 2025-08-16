@@ -55,6 +55,10 @@ export const translations = {
     connect: "SE CONNECTER",
     cancel: "ANNULER",
     chat: "CHAT",
+    waitingForPlayer: "En attente d'un adversaire...",
+    readyToConnect: "Prêt à se connecter...",
+    gamePartyId: "TON ID DE PARTIE",
+    shareId: "Partage cet ID à ton adversaire !",
     
     // Interface
     home: "ACCUEIL",
@@ -232,6 +236,10 @@ export const translations = {
     connect: "CONNECT",
     cancel: "CANCEL",
     chat: "CHAT",
+    waitingForPlayer: "Waiting for opponent...",
+    readyToConnect: "Ready to connect...",
+    gamePartyId: "YOUR GAME ID",
+    shareId: "Share this ID with your opponent!",
     
     // Interface
     home: "HOME",

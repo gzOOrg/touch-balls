@@ -94,7 +94,7 @@ async function hostGameMode() {
     // Callback pour l'ID du peer (amélioré)
     network.onPeerIdReady = (id) => {
       ui.myPeerId.textContent = id;
-      updateStatus('waiting', 'En attente d\'un adversaire...');
+      updateStatus('waiting', t('waitingForPlayer'));
       showAchievement('SERVEUR PRÊT!');
       console.log('🎮 Serveur P2P prêt avec ID:', id);
       
@@ -169,7 +169,7 @@ function joinGameMode() {
   ui.joinSection.style.display = 'block';
   
   // Réinitialiser l'état
-  updateStatus('waiting', 'Prêt à se connecter...');
+  updateStatus('waiting', t('readyToConnect'));
   ui.friendId.value = '';
   ui.friendId.focus();
   
@@ -307,7 +307,7 @@ function setupNetworkCallbacks() {
         ball.vx = data.vx;
         ball.vy = data.vy;
         gameState.isShot = true;
-        gameState.fallenBalls = [];
+        // NE PAS réinitialiser fallenBalls ici - cela interfère avec la logique de tour
         
         if (!isMyShot) {
           // C'est le tir de l'adversaire - compter les stats
