@@ -714,8 +714,8 @@ export const translations = {
     player2Label: "⚡ プレイヤー2 (黒)",
     playerTurn: "ターン",
     
-    // 難易度レベル
-    difficulty: "難易度",
+    // レベル設定
+    difficulty: "レベル",
     noob: "初心者",
     pro: "プロ",
     legend: "レジェンド",
@@ -762,8 +762,8 @@ export const translations = {
     
     // ヘルプテキスト
     difficultyHelp: "初心者：巨大な穴 • プロ：バランス • レジェンド：ハードコアモード",
-    gameInstructions: "👆 ボールをタッチ、後ろに引いて、離して破壊！",
-    startGame: "大虐殺開始",
+    gameInstructions: "👆 ボールをタッチして、引いて、放す！",
+    startGame: "ゲーム開始",
     aimAssist: "エイムアシスト",
     
     // AIメッセージ
