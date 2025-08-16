@@ -778,7 +778,15 @@ export const translations = {
     aiTactical: "戦術ショット！",
     aiUsingPlayerBall: "あなたのボールを使用！",
     aiOneShot: "💀 完璧なワンショット！💀",
-    aiTerminatorMode: "🤖 ターミネーターモード起動！"
+    aiTerminatorMode: "🤖 ターミネーターモード起動！",
+    
+    // Multijoueur
+    waitingForPlayer: "対戦相手を待っています...",
+    readyToConnect: "接続準備完了...",
+    gamePartyId: "あなたのゲームID",
+    shareId: "このIDを対戦相手と共有してください！",
+    generating: "生成中...",
+    disconnected: "切断されました"
   }
 };
 
