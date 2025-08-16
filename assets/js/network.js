@@ -32,6 +32,7 @@ export class Network {
     this.onGameStart = null;
     this.onPlayerNamesUpdate = null;
     this.onGameSettingsUpdate = null;
+    this.onSyncPositionsUpdate = null;
   }
   
   /**
@@ -293,6 +294,13 @@ export class Network {
           this.onGameSettingsUpdate(data);
         }
         break;
+        
+      case MESSAGE_TYPE.SYNC_POSITIONS:
+        console.log('🔄 Synchronisation positions reçue:', data);
+        if (this.onSyncPositionsUpdate) {
+          this.onSyncPositionsUpdate(data);
+        }
+        break;
     }
   }
   
@@ -421,6 +429,17 @@ export class Network {
     return this.sendMessage({
       type: MESSAGE_TYPE.GAME_SETTINGS,
       ...settings
+    });
+  }
+  
+  /**
+   * Envoie les positions finales des balles pour synchronisation
+   */
+  sendFinalPositions(positions) {
+    return this.sendMessage({
+      type: MESSAGE_TYPE.SYNC_POSITIONS,
+      positions: positions,
+      timestamp: Date.now()
     });
   }
   

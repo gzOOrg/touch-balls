@@ -57,7 +57,8 @@ export const MESSAGE_TYPE = {
   TURN_CHANGE: 'turnChange',
   GAME_START: 'gameStart',
   PLAYER_NAMES: 'playerNames',
-  GAME_SETTINGS: 'gameSettings'
+  GAME_SETTINGS: 'gameSettings',
+  SYNC_POSITIONS: 'syncPositions'
 };
 
 // Couleurs des boules

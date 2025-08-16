@@ -53,6 +53,7 @@ let getPlayers = null;
 let onShot = null;
 let onTurnChange = null;
 let onMatchEnd = null;
+let onSyncFinalPositions = null;
 
 /**
  * Définit la fonction pour obtenir le mode de jeu
@@ -75,6 +76,7 @@ export function setNetworkCallbacks(callbacks) {
   onShot = callbacks.onShot || null;
   onTurnChange = callbacks.onTurnChange || null;
   onMatchEnd = callbacks.onMatchEnd || null;
+  onSyncFinalPositions = callbacks.onSyncFinalPositions || null;
 }
 
 /**
@@ -476,9 +478,33 @@ export function updatePhysics(deltaTime) {
  * Vérifie si toutes les boules sont arrêtées
  */
 function allBallsStopped() {
-  return gameState.balls.every(ball => 
+  const allStopped = gameState.balls.every(ball => 
     !ball.isActive || length(ball.vx, ball.vy) <= STOP_VELOCITY
   );
+  
+  // Si toutes les balles sont arrêtées et qu'on est en mode multijoueur
+  if (allStopped && gameState.isShot) {
+    const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+    
+    if ((gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) && onSyncFinalPositions) {
+      console.log('🔄 Toutes les balles arrêtées - Synchronisation des positions finales');
+      
+      // Préparer les positions finales de toutes les balles
+      const finalPositions = gameState.balls.map(ball => ({
+        id: ball.id,
+        x: ball.x,
+        y: ball.y,
+        vx: 0,
+        vy: 0,
+        isActive: ball.isActive
+      }));
+      
+      // Envoyer la synchronisation via le callback
+      onSyncFinalPositions(finalPositions);
+    }
+  }
+  
+  return allStopped;
 }
 
 /**

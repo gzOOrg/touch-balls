@@ -481,6 +481,28 @@ function setupNetworkCallbacks() {
       updateScores(players);
     }
   };
+  
+  // Synchronisation des positions finales reçues
+  network.onSyncPositionsUpdate = (data) => {
+    console.log('🔄 Réception synchronisation positions:', data.positions.length, 'balles');
+    
+    // Appliquer les positions reçues à nos balles
+    data.positions.forEach(pos => {
+      const ball = gameState.balls.find(b => b.id === pos.id);
+      if (ball) {
+        const oldX = ball.x, oldY = ball.y;
+        ball.x = pos.x;
+        ball.y = pos.y;
+        ball.vx = 0;
+        ball.vy = 0;
+        ball.isActive = pos.isActive;
+        
+        console.log(`   Balle ${pos.id.toFixed(3)}: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) → (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})`);
+      }
+    });
+    
+    console.log('✅ Positions synchronisées avec l\'hébergeur');
+  };
 }
 
 /**
@@ -553,6 +575,16 @@ function startGame() {
       }
       
       return success;
+    },
+    onSyncFinalPositions: (positions) => {
+      // Seul l'hébergeur envoie les positions finales
+      if (network.isHost) {
+        console.log('🔄 Envoi synchronisation positions finales:', positions.length, 'balles');
+        const success = network.sendFinalPositions(positions);
+        console.log(`🔄 Positions envoyées: ${success}`);
+        return success;
+      }
+      return false;
     },
     onMatchEnd: (winner) => handleMatchEnd(winner)
   });
