@@ -502,6 +502,25 @@ function setupNetworkCallbacks() {
     });
     
     console.log('✅ Positions synchronisées avec l\'hébergeur');
+    
+    // FORCER le rafraîchissement visuel immédiat
+    console.log('🎨 Forçage du rafraîchissement visuel...');
+    
+    // Force le rendu immédiat pour que les nouvelles positions soient visibles
+    render();
+    console.log('🎨 Rendu forcé via render()');
+    
+    // Force plusieurs frames de rendu pour être sûr
+    requestAnimationFrame(() => {
+      render();
+      requestAnimationFrame(() => {
+        render();
+        console.log('🎨 Triple rendu forcé terminé');
+      });
+    });
+    
+    // Alternative: forcer le prochain frame de la boucle de jeu
+    gameState.lastFrameTime = 0; // Force le prochain update
   };
 }
 
