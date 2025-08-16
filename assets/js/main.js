@@ -288,31 +288,32 @@ function setupNetworkCallbacks() {
     displayChatMessage(message, 'received');
   };
   
-  // Tir reçu (amélioré)
+  // Tir reçu (seulement pour les tirs de l'adversaire)
   network.onShot = (data) => {
     console.log('🎯 Tir reçu:', data);
     
     const ball = gameState.balls.find(b => b.id === data.ballId);
     if (ball) {
-      // Appliquer la vélocité avec précision
-      ball.vx = data.vx;
-      ball.vy = data.vy;
+      const myPlayerIndex = network.isHost ? 0 : 1;
+      const isMyShot = (data.playerIndex === myPlayerIndex);
       
-      // Synchroniser l'état de tir
-      gameState.isShot = true;
-      gameState.fallenBalls = [];
-      
-      // Mettre à jour les statistiques seulement si on n'est pas l'expéditeur
-      if (data.playerIndex !== (network.isHost ? 0 : 1)) {
+      if (!isMyShot) {
+        // C'est le tir de l'adversaire - l'appliquer immédiatement
+        ball.vx = data.vx;
+        ball.vy = data.vy;
+        gameState.isShot = true;
+        gameState.fallenBalls = [];
         gameState.totalShots++;
         updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
-      }
-      
-      console.log('✅ Tir appliqué avec succès');
-      
-      // Synchroniser l'état après le tir si on est l'hôte
-      if (network.isHost) {
-        setTimeout(() => network.syncGameState(), 50);
+        console.log('✅ Tir adversaire appliqué');
+        
+        // Synchroniser l'état après le tir si on est l'hôte
+        if (network.isHost) {
+          setTimeout(() => network.syncGameState(), 50);
+        }
+      } else {
+        // C'est mon propre tir - juste pour confirmation (déjà appliqué localement)
+        console.log('🔄 Confirmation de mon propre tir reçue');
       }
     } else {
       console.warn('⚠️ Balle non trouvée pour le tir:', data.ballId);
@@ -512,10 +513,13 @@ function startGame() {
   // Configurer les callbacks réseau (amélioré)
   setNetworkCallbacks({
     onShot: (ballId, vx, vy) => {
+      // Toujours envoyer le tir en réseau pour synchroniser avec l'adversaire
       const success = network.sendShot(ballId, vx, vy, {
         gameMode: gameMode,
         timestamp: Date.now()
       });
+      
+      console.log(`🎯 Tir envoyé en réseau: ballId=${ballId}, success=${success}`);
       
       // Synchroniser l'état après le tir si on est l'hôte
       if (network.isHost && success) {
