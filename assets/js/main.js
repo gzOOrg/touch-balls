@@ -485,6 +485,12 @@ function setupNetworkCallbacks() {
   // Synchronisation des positions finales reçues
   network.onSyncPositionsUpdate = (data) => {
     console.log('🔄 Réception synchronisation positions:', data.positions.length, 'balles');
+    console.log('🔍 État avant sync - gameState.balls.length:', gameState.balls.length);
+    
+    // Vérifier l'état des balles avant synchronisation
+    gameState.balls.forEach((ball, i) => {
+      console.log(`   Avant [${i}]: id=${ball.id.toFixed(3)}, pos=(${ball.x.toFixed(1)}, ${ball.y.toFixed(1)}), active=${ball.isActive}, color=${ball.color}`);
+    });
     
     // Appliquer les positions reçues à nos balles
     data.positions.forEach(pos => {
@@ -497,8 +503,16 @@ function setupNetworkCallbacks() {
         ball.vy = 0;
         ball.isActive = pos.isActive;
         
-        console.log(`   Balle ${pos.id.toFixed(3)}: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) → (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)})`);
+        console.log(`   Balle ${pos.id.toFixed(3)}: (${oldX.toFixed(1)}, ${oldY.toFixed(1)}) → (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) active=${pos.isActive}`);
+      } else {
+        console.warn(`⚠️ Balle introuvable avec id=${pos.id.toFixed(3)}`);
       }
+    });
+    
+    // Vérifier l'état des balles après synchronisation
+    console.log('🔍 État après sync - gameState.balls.length:', gameState.balls.length);
+    gameState.balls.forEach((ball, i) => {
+      console.log(`   Après [${i}]: id=${ball.id.toFixed(3)}, pos=(${ball.x.toFixed(1)}, ${ball.y.toFixed(1)}), active=${ball.isActive}, color=${ball.color}`);
     });
     
     console.log('✅ Positions synchronisées avec l\'hébergeur');

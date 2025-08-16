@@ -844,8 +844,26 @@ export function render() {
   // Dessiner la table
   drawTable();
   
+  // DEBUG: Vérifier les balles avant le rendu
+  if (gameState.balls.length === 0) {
+    console.warn('⚠️ RENDER: Aucune balle à dessiner! gameState.balls.length = 0');
+  } else {
+    console.log(`🎨 RENDER: ${gameState.balls.length} balles à dessiner`);
+    gameState.balls.forEach((ball, i) => {
+      if (!ball.isActive) {
+        console.log(`   Balle [${i}] INACTIVE: id=${ball.id.toFixed(3)}, pos=(${ball.x.toFixed(1)}, ${ball.y.toFixed(1)})`);
+      } else {
+        console.log(`   Balle [${i}] ACTIVE: id=${ball.id.toFixed(3)}, pos=(${ball.x.toFixed(1)}, ${ball.y.toFixed(1)}), color=${ball.color}`);
+      }
+    });
+  }
+  
   // Dessiner toutes les boules
-  gameState.balls.forEach(ball => ball.draw());
+  gameState.balls.forEach(ball => {
+    if (ball.isActive) {
+      ball.draw();
+    }
+  });
   
   // Dessiner la ligne de visée de l'IA si elle vise
   if (gameState.aiAiming) {
