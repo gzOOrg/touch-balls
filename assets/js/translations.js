@@ -59,6 +59,8 @@ export const translations = {
     readyToConnect: "Prêt à se connecter...",
     gamePartyId: "TON ID DE PARTIE",
     shareId: "Partage cet ID à ton adversaire !",
+    generating: "Génération en cours...",
+    disconnected: "Déconnecté",
     
     // Interface
     home: "ACCUEIL",
@@ -240,6 +242,8 @@ export const translations = {
     readyToConnect: "Ready to connect...",
     gamePartyId: "YOUR GAME ID",
     shareId: "Share this ID with your opponent!",
+    generating: "Generating...",
+    disconnected: "Disconnected",
     
     // Interface
     home: "HOME",

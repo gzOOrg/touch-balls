@@ -94,7 +94,7 @@
     <div id="multiplayerSection" class="multiplayer-section" style="display:none">
       <div class="connection-status">
         <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Déconnecté</span>
+        <span id="statusText" data-translate="disconnected">Déconnecté</span>
       </div>
       
       <div id="hostSection" style="display:none">
@@ -105,12 +105,12 @@
       </div>
       
       <div id="joinSection" style="display:none">
-        <label for="friendId">🎯 ID DE TON ADVERSAIRE</label>
-        <input id="friendId" type="text" placeholder="Colle l'ID ici..." />
-        <button id="connectBtn" class="btn" style="margin-top:10px">SE CONNECTER</button>
+        <label for="friendId" data-translate="opponentId">🎯 ID DE TON ADVERSAIRE</label>
+        <input id="friendId" type="text" data-translate-placeholder="pasteIdHere" placeholder="Colle l'ID ici..." />
+        <button id="connectBtn" class="btn" style="margin-top:10px" data-translate="connect">SE CONNECTER</button>
       </div>
       
-      <button id="cancelMultiplayer" class="btn danger" style="margin-top:15px">ANNULER</button>
+      <button id="cancelMultiplayer" class="btn danger" style="margin-top:15px" data-translate="cancel">ANNULER</button>
     </div>
 
     <!-- Joueurs -->

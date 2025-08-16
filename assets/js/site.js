@@ -476,7 +476,17 @@ const siteTranslations = {
     // Mode héberger
     'gamePartyId': 'TON ID DE PARTIE',
     'copyId': 'COPIER ID',
-    'shareId': 'Partage cet ID à ton adversaire !'
+    'shareId': 'Partage cet ID à ton adversaire !',
+    
+    // Mode rejoindre
+    'opponentId': 'ID DE TON ADVERSAIRE',
+    'pasteIdHere': 'Colle l\'ID ici...',
+    'connect': 'SE CONNECTER',
+    'cancel': 'ANNULER',
+    
+    // Status
+    'disconnected': 'Déconnecté',
+    'generating': 'Génération en cours...'
   },
   
   en: {
@@ -551,7 +561,17 @@ const siteTranslations = {
     // Host mode
     'gamePartyId': 'YOUR GAME ID',
     'copyId': 'COPY ID',
-    'shareId': 'Share this ID with your opponent!'
+    'shareId': 'Share this ID with your opponent!',
+    
+    // Join mode
+    'opponentId': 'OPPONENT\'S GAME ID',
+    'pasteIdHere': 'Paste ID here...',
+    'connect': 'CONNECT',
+    'cancel': 'CANCEL',
+    
+    // Status
+    'disconnected': 'Disconnected',
+    'generating': 'Generating...'
   },
   
   de: {

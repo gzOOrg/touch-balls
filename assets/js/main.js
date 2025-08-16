@@ -82,7 +82,7 @@ async function hostGameMode() {
   
   // Réinitialiser l'état
   updateStatus('connecting', 'Initialisation du serveur P2P...');
-  ui.myPeerId.textContent = 'Génération en cours...';
+  ui.myPeerId.textContent = t('generating');
   
   resetButtonStyles();
   ui.hostBtn.style.background = 'linear-gradient(45deg,var(--neon-green),var(--neon-cyan))';
@@ -231,7 +231,7 @@ function cancelMultiplayer() {
   ui.joinSection.style.display = 'none';
   
   // Réinitialiser les champs
-  ui.myPeerId.textContent = 'Génération en cours...';
+  ui.myPeerId.textContent = t('generating');
   ui.friendId.value = '';
   
   // Réinitialiser le bouton de connexion
@@ -976,7 +976,7 @@ async function copyPeerId() {
   const peerIdText = ui.myPeerId.textContent;
   console.log('Copy peer ID:', peerIdText);
   
-  if (peerIdText !== 'Génération en cours...') {
+  if (peerIdText !== t('generating')) {
     const success = await copyToClipboard(peerIdText);
     if (success) {
       showAchievement('ID COPIÉ!');
