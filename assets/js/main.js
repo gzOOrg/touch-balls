@@ -288,7 +288,7 @@ function setupNetworkCallbacks() {
     displayChatMessage(message, 'received');
   };
   
-  // Tir reçu (seulement pour les tirs de l'adversaire)
+  // Tir reçu (TOUJOURS appliquer pour assurer la synchronisation)
   network.onShot = (data) => {
     console.log('🎯 Tir reçu:', data);
     
@@ -297,23 +297,33 @@ function setupNetworkCallbacks() {
       const myPlayerIndex = network.isHost ? 0 : 1;
       const isMyShot = (data.playerIndex === myPlayerIndex);
       
-      if (!isMyShot) {
-        // C'est le tir de l'adversaire - l'appliquer immédiatement
+      console.log(`🎯 Analyse tir: playerIndex=${data.playerIndex}, myIndex=${myPlayerIndex}, isMyShot=${isMyShot}`);
+      
+      // TOUJOURS appliquer le tir pour garantir la synchronisation
+      const wasMoving = (Math.abs(ball.vx) > 0.1 || Math.abs(ball.vy) > 0.1);
+      
+      if (!wasMoving) {
+        // Appliquer la vélocité si la balle n'était pas déjà en mouvement
         ball.vx = data.vx;
         ball.vy = data.vy;
         gameState.isShot = true;
         gameState.fallenBalls = [];
-        gameState.totalShots++;
-        updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
-        console.log('✅ Tir adversaire appliqué');
+        
+        if (!isMyShot) {
+          // C'est le tir de l'adversaire - compter les stats
+          gameState.totalShots++;
+          updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
+          console.log('✅ Tir adversaire appliqué et comptabilisé');
+        } else {
+          console.log('✅ Echo de mon propre tir appliqué (sécurité)');
+        }
         
         // Synchroniser l'état après le tir si on est l'hôte
         if (network.isHost) {
           setTimeout(() => network.syncGameState(), 50);
         }
       } else {
-        // C'est mon propre tir - juste pour confirmation (déjà appliqué localement)
-        console.log('🔄 Confirmation de mon propre tir reçue');
+        console.log('🔄 Balle déjà en mouvement, pas de double application');
       }
     } else {
       console.warn('⚠️ Balle non trouvée pour le tir:', data.ballId);
@@ -517,6 +527,9 @@ function startGame() {
   setNetworkCallbacks({
     onShot: (ballId, vx, vy) => {
       // Toujours envoyer le tir en réseau pour synchroniser avec l'adversaire
+      console.log(`🎯 CALLBACK onShot appelé: ballId=${ballId}, mode=${gameMode}`);
+      console.log(`🎯 Réseau connecté: ${network.getStatus()}, isHost: ${network.isHost}`);
+      
       const success = network.sendShot(ballId, vx, vy, {
         gameMode: gameMode,
         timestamp: Date.now()
