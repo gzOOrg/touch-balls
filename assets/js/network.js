@@ -20,6 +20,9 @@ export class Network {
     this.lastPingTime = 0;
     this.pingLatency = 0;
     this.connectionStatus = 'disconnected';
+    this.reconnectionAttempts = 0;
+    this.maxReconnectionAttempts = 3;
+    this.lastKnownHostId = null;
     
     // Callbacks
     this.onChatMessage = null;
@@ -96,6 +99,7 @@ export class Network {
   async connectToHost(hostPeerId) {
     console.log('Connexion à l\'hôte:', hostPeerId);
     this.isHost = false;
+    this.lastKnownHostId = hostPeerId.trim(); // Sauvegarder pour reconnexion
     
     if (!this.peer) {
       try {
@@ -125,7 +129,7 @@ export class Network {
     updateStatus('connecting', 'Connexion en cours...');
     
     try {
-      const connection = this.peer.connect(hostPeerId.trim());
+      const connection = this.peer.connect(this.lastKnownHostId);
       this.handleConnection(connection);
       
       // Attendre que la connexion soit ouverte
@@ -134,6 +138,9 @@ export class Network {
         connection.on('error', reject);
         setTimeout(() => reject(new Error('Timeout de connexion')), 10000);
       });
+      
+      // Réinitialiser le compteur de reconnexion en cas de succès
+      this.reconnectionAttempts = 0;
       
     } catch(e) {
       console.error('Erreur de connexion:', e);
@@ -185,10 +192,19 @@ export class Network {
     });
     
     connection.on('close', () => {
-      console.log('Connexion fermée');
+      console.log('🔌 Connexion fermée');
       this.connectionStatus = 'disconnected';
       updateStatus('error', 'Connexion fermée');
       this.stopPingInterval();
+      
+      // Notification de déconnexion avec son
+      showAchievement('ADVERSAIRE DÉCONNECTÉ!');
+      if (typeof sfx !== 'undefined' && sfx.error) {
+        sfx.error();
+      }
+      
+      // Essayer de se reconnecter automatiquement (3 tentatives max)
+      this.attemptReconnection();
       
       if (this.onConnectionClosed) {
         this.onConnectionClosed();
@@ -231,16 +247,30 @@ export class Network {
         break;
         
       case MESSAGE_TYPE.GAME_STATE:
+        console.log('🔄 Réception état de jeu:', data);
         if (this.onGameStateUpdate) {
           this.onGameStateUpdate(data);
+        }
+        // Auto-synchroniser l'état si on est l'hôte et qu'il y a eu des changements
+        if (this.isHost && data.timestamp) {
+          setTimeout(() => this.syncGameState(), 100);
         }
         break;
         
       case MESSAGE_TYPE.TURN_CHANGE:
+        console.log('🔄 Changement de tour reçu:', data);
         this.isMyTurn = (this.isHost && data.turn === 0) || (!this.isHost && data.turn === 1);
+        
         if (this.onTurnChange) {
           this.onTurnChange(data.turn, this.isMyTurn);
         }
+        
+        // Synchroniser l'état après changement de tour si on est l'hôte
+        if (this.isHost) {
+          setTimeout(() => this.syncGameState(), 50);
+        }
+        
+        console.log(`✅ Tour ${data.turn}, Mon tour: ${this.isMyTurn}`);
         break;
         
       case MESSAGE_TYPE.GAME_START:
@@ -296,24 +326,30 @@ export class Network {
   }
   
   /**
-   * Envoie les données d'un tir
+   * Envoie les données d'un tir (amélioré)
    */
-  sendShot(ballId, vx, vy) {
-    return this.sendMessage({
+  sendShot(ballId, vx, vy, shotData = {}) {
+    const shotMessage = {
       type: MESSAGE_TYPE.SHOT,
       ballId,
       vx,
-      vy
-    });
+      vy,
+      timestamp: Date.now(),
+      playerIndex: this.isHost ? 0 : 1,
+      ...shotData
+    };
+    
+    console.log('🎯 Envoi tir:', shotMessage);
+    return this.sendMessage(shotMessage);
   }
   
   /**
-   * Synchronise l'état du jeu
+   * Synchronise l'état du jeu (amélioré)
    */
   syncGameState() {
-    if (!this.isHost) return;
+    if (!this.isHost) return false;
     
-    // Obtenir les données à synchroniser
+    // Obtenir les données à synchroniser avec plus de détails
     const syncData = {
       type: MESSAGE_TYPE.GAME_STATE,
       balls: gameState.balls.map(ball => ({
@@ -324,24 +360,37 @@ export class Network {
         vy: ball.vy,
         color: ball.color,
         owner: ball.owner,
-        isActive: ball.isActive
+        isActive: ball.isActive,
+        radius: ball.radius
       })),
       currentTurn: gameState.currentTurn,
       roundOver: gameState.roundOver,
-      matchOver: gameState.matchOver
+      matchOver: gameState.matchOver,
+      roundsWon: gameState.roundsWon || [0, 0],
+      totalShots: gameState.totalShots || 0,
+      currentStreak: gameState.currentStreak || 0,
+      isShot: gameState.isShot || false,
+      fallenBalls: gameState.fallenBalls || [],
+      timestamp: Date.now()
     };
     
+    console.log('🔄 Synchronisation état de jeu:', syncData);
     return this.sendMessage(syncData);
   }
   
   /**
-   * Envoie un changement de tour
+   * Envoie un changement de tour (amélioré)
    */
   sendTurnChange(turn) {
-    return this.sendMessage({
+    const turnMessage = {
       type: MESSAGE_TYPE.TURN_CHANGE,
-      turn
-    });
+      turn,
+      timestamp: Date.now(),
+      hostTurn: this.isHost ? (turn === 0) : (turn === 1)
+    };
+    
+    console.log('🔄 Envoi changement de tour:', turnMessage);
+    return this.sendMessage(turnMessage);
   }
   
   /**
@@ -376,7 +425,7 @@ export class Network {
   }
   
   /**
-   * Démarre l'intervalle de ping
+   * Démarre l'intervalle de ping et synchronisation
    */
   startPingInterval() {
     // Premier ping après 1 seconde
@@ -384,25 +433,42 @@ export class Network {
       if (this.conn?.open) {
         this.lastPingTime = Date.now();
         this.sendMessage({ type: MESSAGE_TYPE.PING, timestamp: this.lastPingTime });
+        
+        // Première synchronisation si on est l'hôte
+        if (this.isHost) {
+          this.syncGameState();
+        }
       }
     }, 1000);
     
-    // Puis toutes les 3 secondes
+    // Puis toutes les 3 secondes pour le ping
     this.pingInterval = setInterval(() => {
       if (this.conn?.open) {
         this.lastPingTime = Date.now();
         this.sendMessage({ type: MESSAGE_TYPE.PING, timestamp: this.lastPingTime });
       }
     }, 3000);
+    
+    // Synchronisation automatique toutes les 5 secondes si on est l'hôte
+    this.syncInterval = setInterval(() => {
+      if (this.conn?.open && this.isHost) {
+        this.syncGameState();
+      }
+    }, 5000);
   }
   
   /**
-   * Arrête l'intervalle de ping
+   * Arrête l'intervalle de ping et synchronisation
    */
   stopPingInterval() {
     if (this.pingInterval) {
       clearInterval(this.pingInterval);
       this.pingInterval = null;
+    }
+    
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
     }
   }
   
@@ -447,6 +513,44 @@ export class Network {
    */
   getPing() {
     return this.pingLatency;
+  }
+  
+  /**
+   * Tentative de reconnexion automatique
+   */
+  attemptReconnection() {
+    // Ne pas essayer de se reconnecter si on est l'hôte ou si on a dépassé le max
+    if (this.isHost || this.reconnectionAttempts >= this.maxReconnectionAttempts || !this.lastKnownHostId) {
+      console.log('🚫 Reconnexion automatique annulée');
+      return;
+    }
+    
+    this.reconnectionAttempts++;
+    console.log(`🔄 Tentative de reconnexion ${this.reconnectionAttempts}/${this.maxReconnectionAttempts}...`);
+    
+    // Attendre un délai progressif avant de se reconnecter
+    const delay = this.reconnectionAttempts * 2000; // 2s, 4s, 6s
+    
+    setTimeout(async () => {
+      try {
+        updateStatus('connecting', `Reconnexion... (${this.reconnectionAttempts}/${this.maxReconnectionAttempts})`);
+        showAchievement(`RECONNEXION ${this.reconnectionAttempts}/${this.maxReconnectionAttempts}`);
+        
+        await this.connectToHost(this.lastKnownHostId);
+        
+        console.log('✅ Reconnexion réussie!');
+        showAchievement('RECONNECTÉ!');
+        
+      } catch(e) {
+        console.error(`❌ Échec reconnexion ${this.reconnectionAttempts}:`, e);
+        
+        if (this.reconnectionAttempts >= this.maxReconnectionAttempts) {
+          console.log('💀 Abandon reconnexion après maximum de tentatives');
+          updateStatus('error', 'Reconnexion impossible');
+          showAchievement('CONNEXION PERDUE!');
+        }
+      }
+    }, delay);
   }
 }
 

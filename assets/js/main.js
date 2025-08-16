@@ -91,19 +91,55 @@ async function hostGameMode() {
     // Configurer les callbacks réseau
     setupNetworkCallbacks();
     
-    // Callback pour l'ID du peer
+    // Callback pour l'ID du peer (amélioré)
     network.onPeerIdReady = (id) => {
       ui.myPeerId.textContent = id;
       updateStatus('waiting', 'En attente d\'un adversaire...');
       showAchievement('SERVEUR PRÊT!');
       console.log('🎮 Serveur P2P prêt avec ID:', id);
+      
+      // Activer le bouton de copie
+      ui.copyPeerBtn.disabled = false;
+      ui.copyPeerBtn.style.opacity = '1';
+      
+      // Améliorer la visibilité de l'ID
+      ui.myPeerId.style.color = 'var(--neon-green)';
+      ui.myPeerId.style.fontWeight = 'bold';
+      ui.myPeerId.style.animation = 'pulse 2s infinite';
     };
     
-    // Callback pour la connexion établie
+    // Callback pour la connexion établie (amélioré)
     network.onConnectionReady = () => {
       updateStatus('connected', 'Adversaire connecté!');
       showAchievement('ADVERSAIRE CONNECTÉ!');
       console.log('🎮 Adversaire connecté au serveur');
+      
+      // Arrêter l'animation de l'ID et le colorer en bleu
+      ui.myPeerId.style.animation = 'none';
+      ui.myPeerId.style.color = 'var(--neon-cyan)';
+      
+      // Activer automatiquement les contrôles de jeu
+      document.getElementById('p1').disabled = false;
+      document.getElementById('p2').disabled = false;
+      
+      // Démarrer une synchronisation initiale des paramètres
+      setTimeout(() => {
+        if (network.isHost) {
+          network.sendPlayerNames(
+            document.getElementById('p1').value || 'Player 1',
+            document.getElementById('p2').value || 'Player 2'
+          );
+          
+          const diffInput = document.querySelector('input[name=\"difficulty\"]:checked');
+          const difficulty = diffInput ? parseInt(diffInput.value) : 2;
+          
+          network.sendGameSettings({
+            difficulty: difficulty,
+            player1Assist: document.getElementById('assistP1').checked,
+            player2Assist: document.getElementById('assistP2').checked
+          });
+        }
+      }, 500);
     };
     
     // Initialiser le serveur
@@ -143,11 +179,26 @@ function joinGameMode() {
   // Configurer les callbacks réseau
   setupNetworkCallbacks();
   
-  // Callback pour la connexion établie
+  // Callback pour la connexion établie (amélioré)
   network.onConnectionReady = () => {
     updateStatus('connected', 'Connecté à l\'hôte!');
     showAchievement('CONNEXION ÉTABLIE!');
     console.log('🎮 Connecté à l\'hôte');
+    
+    // Masquer le champ de saisie de l'ID ami
+    ui.friendId.style.opacity = '0.5';
+    ui.friendId.disabled = true;
+    
+    // Mettre à jour le bouton de connexion
+    ui.connectBtn.textContent = 'CONNECTÉ!';
+    ui.connectBtn.style.background = 'linear-gradient(45deg, var(--neon-green), var(--neon-cyan))';
+    ui.connectBtn.disabled = true;
+    
+    // Effet visuel de succès
+    ui.connectBtn.style.animation = 'pulse 1s ease-in-out 3';
+    
+    // Attendre la synchronisation des paramètres depuis l'hôte
+    updateStatus('connected', 'Synchronisation avec l\'hôte...');
   };
   
   console.log('✅ Mode rejoindre initialisé');
@@ -237,35 +288,73 @@ function setupNetworkCallbacks() {
     displayChatMessage(message, 'received');
   };
   
-  // Tir reçu
+  // Tir reçu (amélioré)
   network.onShot = (data) => {
+    console.log('🎯 Tir reçu:', data);
+    
     const ball = gameState.balls.find(b => b.id === data.ballId);
     if (ball) {
+      // Appliquer la vélocité avec précision
       ball.vx = data.vx;
       ball.vy = data.vy;
+      
+      // Synchroniser l'état de tir
       gameState.isShot = true;
       gameState.fallenBalls = [];
-      gameState.totalShots++;
-      updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
+      
+      // Mettre à jour les statistiques seulement si on n'est pas l'expéditeur
+      if (data.playerIndex !== (network.isHost ? 0 : 1)) {
+        gameState.totalShots++;
+        updateStats(gameState.totalShots, gameState.currentStreak, gameState.gameStartTime);
+      }
+      
+      console.log('✅ Tir appliqué avec succès');
+      
+      // Synchroniser l'état après le tir si on est l'hôte
+      if (network.isHost) {
+        setTimeout(() => network.syncGameState(), 50);
+      }
+    } else {
+      console.warn('⚠️ Balle non trouvée pour le tir:', data.ballId);
     }
   };
   
-  // État de jeu synchronisé
+  // État de jeu synchronisé (amélioré)
   network.onGameStateUpdate = (data) => {
-    // Synchroniser les boules
-    gameState.balls = data.balls.map(ballData => {
-      const ball = Object.create(gameState.balls[0].__proto__); // Copier le prototype
-      Object.assign(ball, ballData);
-      return ball;
-    });
+    console.log('🔄 Mise à jour état de jeu reçue:', data);
     
+    // Synchroniser les boules avec plus de précision
+    if (data.balls && Array.isArray(data.balls)) {
+      gameState.balls = data.balls.map(ballData => {
+        const ball = Object.create(gameState.balls[0].__proto__); // Copier le prototype
+        Object.assign(ball, ballData);
+        return ball;
+      });
+    }
+    
+    // Synchroniser tous les états de jeu
     gameState.redBall = gameState.balls.find(b => b.color === '#e11d48');
-    gameState.currentTurn = data.currentTurn;
-    gameState.roundOver = data.roundOver;
-    gameState.matchOver = data.matchOver;
+    gameState.currentTurn = data.currentTurn !== undefined ? data.currentTurn : gameState.currentTurn;
+    gameState.roundOver = data.roundOver !== undefined ? data.roundOver : gameState.roundOver;
+    gameState.matchOver = data.matchOver !== undefined ? data.matchOver : gameState.matchOver;
     
+    // Synchroniser les scores et statistiques
+    if (data.roundsWon) {
+      gameState.roundsWon = data.roundsWon;
+      players[0].wins = data.roundsWon[0];
+      players[1].wins = data.roundsWon[1];
+    }
+    
+    if (data.totalShots !== undefined) gameState.totalShots = data.totalShots;
+    if (data.currentStreak !== undefined) gameState.currentStreak = data.currentStreak;
+    if (data.isShot !== undefined) gameState.isShot = data.isShot;
+    if (data.fallenBalls) gameState.fallenBalls = data.fallenBalls;
+    
+    // Mettre à jour l'interface
     updateScores(players);
     updateTurnIndicator(players[gameState.currentTurn], gameState.isShot);
+    
+    console.log('✅ État de jeu synchronisé avec succès');
   };
   
   // Changement de tour
@@ -308,7 +397,7 @@ function setupNetworkCallbacks() {
     updateScores(players);
   };
   
-  // Mise à jour des paramètres du jeu
+  // Mise à jour des paramètres du jeu (amélioré)
   network.onGameSettingsUpdate = (data) => {
     console.log('⚙️ Paramètres du jeu mis à jour:', data);
     
@@ -324,16 +413,31 @@ function setupNetworkCallbacks() {
     document.getElementById('assistP1').checked = players[0].assist;
     document.getElementById('assistP2').checked = players[1].assist;
     
-    // Désactiver les contrôles pour le client
+    // Désactiver les contrôles pour le client avec effet visuel
     if (gameMode === GAME_MODE.GUEST) {
-      document.getElementById('p1').disabled = true;
-      document.getElementById('p2').disabled = true;
-      document.querySelectorAll('input[name="difficulty"]').forEach(input => input.disabled = true);
-      document.getElementById('assistP1').disabled = true;
-      document.getElementById('assistP2').disabled = true;
+      const controlsToDisable = [
+        document.getElementById('p1'),
+        document.getElementById('p2'),
+        document.getElementById('assistP1'),
+        document.getElementById('assistP2'),
+        ...document.querySelectorAll('input[name="difficulty"]')
+      ];
       
-      // Afficher un message informatif
-      showAchievement('PARAMÈTRES SYNCHRONISÉS!');
+      controlsToDisable.forEach(control => {
+        if (control) {
+          control.disabled = true;
+          control.style.opacity = '0.6';
+          control.style.cursor = 'not-allowed';
+        }
+      });
+      
+      // Afficher un message informatif avec détails
+      const diffNames = ['NOOB', 'PRO', 'LEGEND'];
+      const diffName = diffNames[difficulty - 1] || 'PRO';
+      showAchievement(`PARAMÈTRES REÇUS! DIFFICULTÉ: ${diffName}`);
+      
+      // Effet visuel sur la synchronisation
+      updateStatus('connected', 'Prêt à jouer!');
       
       // Mettre à jour l'affichage des scores
       updateScores(players);
@@ -381,10 +485,31 @@ function startGame() {
   setGameModeGetter(() => gameMode);
   setPlayersGetter(() => players);
   
-  // Configurer les callbacks réseau
+  // Configurer les callbacks réseau (amélioré)
   setNetworkCallbacks({
-    onShot: (ballId, vx, vy) => network.sendShot(ballId, vx, vy),
-    onTurnChange: (turn) => network.sendTurnChange(turn),
+    onShot: (ballId, vx, vy) => {
+      const success = network.sendShot(ballId, vx, vy, {
+        gameMode: gameMode,
+        timestamp: Date.now()
+      });
+      
+      // Synchroniser l'état après le tir si on est l'hôte
+      if (network.isHost && success) {
+        setTimeout(() => network.syncGameState(), 100);
+      }
+      
+      return success;
+    },
+    onTurnChange: (turn) => {
+      const success = network.sendTurnChange(turn);
+      
+      // Synchroniser l'état après changement de tour si on est l'hôte
+      if (network.isHost && success) {
+        setTimeout(() => network.syncGameState(), 50);
+      }
+      
+      return success;
+    },
     onMatchEnd: (winner) => handleMatchEnd(winner)
   });
   
