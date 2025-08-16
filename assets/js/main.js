@@ -360,6 +360,7 @@ function setupNetworkCallbacks() {
   
   // Changement de tour (avec gestion des couleurs multijoueur)
   network.onTurnChange = (turn, isMyTurn) => {
+    console.log(`🔄 CHANGEMENT DE TOUR REÇU: ${turn}, isMyTurn: ${isMyTurn}`);
     gameState.currentTurn = turn;
     
     // Mise à jour de l'indicateur de tour avec les bonnes couleurs
@@ -372,9 +373,11 @@ function setupNetworkCallbacks() {
       if (network.isHost) {
         const message = turn === 0 ? 'VOTRE TOUR (BLANCHES)' : `TOUR DE ${players[1].name} (NOIRES)`;
         if (turn === 0) showComboText(message);
+        console.log(`🎯 HOST - ${message}`);
       } else {
         const message = turn === 1 ? 'VOTRE TOUR (NOIRES)' : `TOUR DE ${players[0].name} (BLANCHES)`;
         if (turn === 1) showComboText(message);
+        console.log(`🎯 GUEST - ${message}`);
       }
     }
     

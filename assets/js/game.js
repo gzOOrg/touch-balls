@@ -320,22 +320,26 @@ export function resetBalls() {
   const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
   
   if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
-    // Mode multijoueur : hébergeur = blanches (0), rejoignant = noires (1)
+    // Mode multijoueur : hébergeur = blanches (0) À GAUCHE, rejoignant = noires (1) À DROITE
     const isHost = (gameMode === GAME_MODE.HOST);
     
-    // Boules blanches - toujours pour l'hébergeur (joueur 0)
+    // Boules blanches - HÉBERGEUR (joueur 0) - À GAUCHE
     gameState.balls.push(
       new Ball(centerX - 180, centerY - 40, BALL_COLORS.WHITE, 0),
       new Ball(centerX - 180, centerY + 40, BALL_COLORS.WHITE, 0)
     );
     
-    // Boules noires - toujours pour le rejoignant (joueur 1)
+    // Boules noires - REJOIGNANT (joueur 1) - À DROITE  
     gameState.balls.push(
       new Ball(centerX + 180, centerY - 40, BALL_COLORS.BLACK, 1),
       new Ball(centerX + 180, centerY + 40, BALL_COLORS.BLACK, 1)
     );
     
-    console.log(`🎮 Mode ${gameMode}: Hébergeur=Blanches(0), Rejoignant=Noires(1)`);
+    console.log(`🎮 Mode ${gameMode}: Hébergeur=Blanches(0) GAUCHE, Rejoignant=Noires(1) DROITE`);
+    console.log(`🎮 Balles créées: ${gameState.balls.length} total`);
+    gameState.balls.forEach((ball, i) => {
+      console.log(`   Balle ${i}: owner=${ball.owner}, color=${ball.color}, x=${ball.x}`);
+    });
   } else {
     // Mode local/IA : attribution normale
     // Boules blanches (joueur 1)
@@ -963,8 +967,12 @@ function handlePointerDown(x, y) {
   // Enregistrer la position du clic pour le debug
   gameState.debugClick = { x, y, time: Date.now() };
   
+  const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+  console.log(`🎮 Clic détecté! Mode: ${gameMode}, Tour actuel: ${gameState.currentTurn}`);
+  
   // En mode IA, empêcher le joueur de jouer pendant le tour de l'IA
-  if (getGameMode && getGameMode() === GAME_MODE.AI && gameState.currentTurn === 1) {
+  if (gameMode === GAME_MODE.AI && gameState.currentTurn === 1) {
+    console.log('🤖 Tour de l\'IA - clic ignoré');
     return;
   }
   
@@ -983,9 +991,11 @@ function handlePointerDown(x, y) {
       if (gameMode === GAME_MODE.HOST) {
         // L'hébergeur ne peut jouer que quand c'est le tour 0 (ses balles blanches)
         canPlayThisBall = (gameState.currentTurn === 0 && ball.owner === 0);
+        console.log(`🎯 HOST: currentTurn=${gameState.currentTurn}, ball.owner=${ball.owner}, canPlay=${canPlayThisBall}`);
       } else {
         // Le rejoignant ne peut jouer que quand c'est le tour 1 (ses balles noires)
         canPlayThisBall = (gameState.currentTurn === 1 && ball.owner === 1);
+        console.log(`🎯 GUEST: currentTurn=${gameState.currentTurn}, ball.owner=${ball.owner}, canPlay=${canPlayThisBall}`);
       }
     } else {
       // Mode local/IA : attribution classique
@@ -1134,9 +1144,20 @@ function handlePointerUp() {
         sfx.epic();
       }
       
-      // Envoyer le tir en réseau si nécessaire
-      if (onShot && getGameMode && (getGameMode() === GAME_MODE.HOST || getGameMode() === GAME_MODE.GUEST)) {
-        onShot(gameState.draggedBall.id, gameState.draggedBall.vx, gameState.draggedBall.vy);
+      // En mode multijoueur, toujours appliquer le tir localement ET l'envoyer en réseau
+      const gameMode = getGameMode ? getGameMode() : GAME_MODE.LOCAL;
+      
+      if (gameMode === GAME_MODE.HOST || gameMode === GAME_MODE.GUEST) {
+        console.log(`🎯 TIRER! Mode: ${gameMode}, Tour: ${gameState.currentTurn}, Balle: ${gameState.draggedBall.id}`);
+        console.log(`🎯 Vélocité appliquée: vx=${gameState.draggedBall.vx}, vy=${gameState.draggedBall.vy}`);
+        
+        // Envoyer en réseau pour synchroniser avec l'adversaire
+        if (onShot) {
+          onShot(gameState.draggedBall.id, gameState.draggedBall.vx, gameState.draggedBall.vy);
+        }
+        
+        // IMPORTANT: Le tir est déjà appliqué localement aux lignes 1119-1120 !
+        // Donc le joueur voit immédiatement son action
       }
     }
   }
@@ -1174,6 +1195,14 @@ export function startMatch() {
     // En mode multijoueur : l'hébergeur (player 0) commence toujours
     gameState.currentTurn = 0;
     console.log('🎯 Mode multijoueur: L\'hébergeur (player 0 - blanches) commence');
+    
+    // Forcer la synchronisation du tour initial
+    if (onTurnChange) {
+      setTimeout(() => {
+        console.log('🔄 Synchronisation forcée du tour initial');
+        onTurnChange(0);
+      }, 100);
+    }
   } else {
     // Mode local/IA : choix aléatoire
     gameState.currentTurn = Math.random() < 0.5 ? 0 : 1;
